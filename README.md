@@ -42,6 +42,8 @@ Salad will provide predefined step-definitions which can be used in the existing
   <th>Rest api Commands</th>
   <td>
       <a href="#post">post</a> 
+      <a href="#put">put</a> 
+      <a href="#get">get</a> 
   </td>
 </tr>
 <tr>
@@ -321,12 +323,12 @@ Scenario: post body from file to a rest url
 Yes you can use variables in the url and body. Also body can be read from a file in classpath
 ```cucumber
 Scenario: put body to a rest url
-    When put "${hostname}/api/salad/customer" "{"firstName":"##string(8)","lastName":"##string","ssn":"##numeric(9)"}"
+    When put "${hostname}/api/salad/customer/1" "{"firstName":"##string(8)","lastName":"##string","ssn":"##numeric(9)"}"
     Then match "${response.status}" == "200"
     * def "customerId" = "${response.body.id}"
     
 Scenario: put body from file to a rest url
-    When post "${hostname}/api/salad/customer" "resource:json/customerRequest.json"
+    When post "${hostname}/api/salad/customer/1" "resource:json/customerRequest.json"
     Then match "${response.status}" == "200"
 ```
 ## `get`
