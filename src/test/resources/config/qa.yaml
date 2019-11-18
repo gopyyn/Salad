@@ -1,0 +1,16 @@
+system:
+  webdriver.chrome.driver: /Users/gopinath/softwares/chromedriver
+
+hibernate:
+  hibernate.connection.driver_class: org.h2.Driver
+  hibernate.connection.url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1
+  hibernate.connection.username: ""
+  hibernate.connection.password: ""
+  hibernate.dialect: org.hibernate.dialect.H2Dialect
+  hibernate.default_schema: PUBLIC
+  hibernate.show_sql: true
+
+global:
+  userId: testUserId
+  password: somepassword@123
+  rest-host: https://jsonplaceholder.typicode.com
