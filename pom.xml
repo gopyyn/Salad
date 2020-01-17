@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.salad</groupId>
     <artifactId>cucumber-salad</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <properties>
         <cucumber.version>4.3.1</cucumber.version>
