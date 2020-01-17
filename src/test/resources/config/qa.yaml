@@ -1,5 +1,5 @@
 system:
-  webdriver.chrome.driver: /Users/gopinath/softwares/chromedriver
+  webdriver.chrome.driver: C:\dev\selenium\chromedriver.exe
 
 hibernate:
   hibernate.connection.driver_class: org.h2.Driver

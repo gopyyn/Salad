@@ -271,6 +271,24 @@ hoverAndClick "hover text" "click text"
 Scenario: Go to Desktop page
     And hoverAndClick "Deals" "Desktop"
 ```
+## `alert`
+#### alert action
+alert "<accept|dismiss>"
+```cucumber
+Scenario: Go to Desktop page
+    And alert accept
+    Then alert dismiss
+```
+## `switch Window`
+#### switch window to the new page or tab
+switch window
+switch window to "<window page>"
+```cucumber
+Scenario: switch window to next newly opened page/tab
+    And switch window
+Scenario: switch window to main page
+    And switch window to "main"
+```
 ## `fill page`
 #### fill page with list of provided values
 fill page "\<json key value>" or fill page "resource:jsonFilePath"

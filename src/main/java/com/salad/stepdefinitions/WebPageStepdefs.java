@@ -95,6 +95,22 @@ public class WebPageStepdefs {
     public void defineScenarioVar(String name, String value) {
         SaladCommands.setValue(name.replaceAll("['\"]", ""), value);
     }
+
+
+    @And("alert (.+)")
+    public void alertAccept(String alertAction) {
+        SaladCommands.alert(alertAction);
+    }
+
+    @And("switch window")
+    public void switchWindow() {
+        SaladCommands.switchWindow();
+    }
+
+    @And("switch window (to) {string}")
+    public void switchWindow(String windowName) {
+        SaladCommands.switchWindow(windowName);
+    }
 }
 
 

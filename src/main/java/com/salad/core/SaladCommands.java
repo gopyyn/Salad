@@ -7,6 +7,7 @@ import com.salad.enums.VerifyType;
 import com.salad.rest.RestApi;
 import com.salad.selenium.Driver;
 import com.salad.selenium.Waits;
+import com.salad.utils.AlertUtils;
 import com.salad.utils.Selector;
 import cucumber.api.Scenario;
 import cucumber.runtime.CucumberException;
@@ -34,6 +35,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
+import static com.salad.core.SaladContext.getContext;
 import static com.salad.enums.SelectorType.TEXT;
 import static com.salad.enums.TimeUnit.SECOND;
 import static com.salad.enums.TimeUnit.getDuration;
@@ -317,15 +319,15 @@ public class SaladCommands {
     }
 
     public static void set(String name, String value) {
-        SaladContext.getContext().getScenarioVariables().put(name, parse(value));
+        getContext().getScenarioVariables().put(name, parse(value));
     }
 
     public static void setValue(String name, String value) {
-        SaladContext.getContext().getScenarioVariables().put(name, getElementValue(value));
+        getContext().getScenarioVariables().put(name, getElementValue(value));
     }
 
     public static void def(String name, String value) {
-        SaladContext.getContext().getFeatureVariables().put(name, parse(value));
+        getContext().getFeatureVariables().put(name, parse(value));
     }
 
     public static void hoverAndClick(String hoverLinkName, String clickLinkName) {
@@ -369,24 +371,12 @@ public class SaladCommands {
     public static Object parse(String exp) {
         exp = replaceSaladRandomNotation(exp);
         if (exp.contains("${")) {
-            String variable = substringBetween(exp, "${", "}");
-            String expPrefix = substringBefore(exp, "${");
-            String expSuffix = substringAfter(exp, "}");
-            String effectiveVariable = substringBefore(variable, ".");
-            String pathExpression = substringAfter(variable, ".");
-            Object expValue = ofNullable(SaladContext.getContext().getVariableIfPresent(effectiveVariable))
-                    .orElse(variable);
-
-            if (isJson(expValue) && isNotEmpty(pathExpression)) {
-                expValue = convertToJsonString(JsonPath.read((String) expValue, pathExpression));
-            } else if (!(expValue instanceof String)) {
-                expValue = eval(variable);
+            String[] variables = substringsBetween(exp, "${", "}");
+            for (String variable : variables) {
+                Object expValue = resolveVariable(variable);
+                exp = replaceOnce(exp, "${" + variable + "}", expValue.toString());
             }
-
-            if (isEmpty(expPrefix) && isEmpty(expSuffix)) {
-                return expValue;
-            }
-            return expPrefix + expValue + parse(expSuffix);
+            parse(exp);
         }
 
         if (exp.startsWith("Java.type(")) {
@@ -397,6 +387,21 @@ public class SaladCommands {
             return eval(substringAfter(exp, "eval "));
         }
         return exp;
+    }
+
+    private static Object resolveVariable(String variable) {
+        String effectiveVariable = substringBefore(variable, ".");
+        String pathExpression = substringAfter(variable, ".");
+        Object expValue = ofNullable(getContext().getVariableIfPresent(effectiveVariable))
+                .orElse(variable);
+
+        if (isJson(expValue) && isNotEmpty(pathExpression)) {
+            return convertToJsonString(JsonPath.read((String) expValue, pathExpression));
+        } else if (!(expValue instanceof String)) {
+            return eval(variable);
+        }
+
+        return expValue;
     }
 
     //NOSONAR. This method will Replace {ssn: ##numeric(8), name: ##string} with {ssn: ${random.numeric(8)}, name: ${random.string()}}
@@ -414,7 +419,7 @@ public class SaladCommands {
         ScriptEngine nashorn = manager.getEngineByName("nashorn");
 
         Bindings bindings = nashorn.getBindings(100); //NOSONAR
-        Map<String, Object> map = SaladContext.getContext().getAllVariable();
+        Map<String, Object> map = getContext().getAllVariable();
         map.forEach(bindings::put);
 
         try {
@@ -521,31 +526,31 @@ public class SaladCommands {
     }
 
     public static String getVariableAsStringIfPresent(String name) {
-        return SaladContext.getContext().getVariableAsStringIfPresent(name);
+        return getContext().getVariableAsStringIfPresent(name);
     }
 
     public static String getVariableAsString(String name) {
-        return SaladContext.getContext().getVariableAsString(name);
+        return getContext().getVariableAsString(name);
     }
 
     public static Object getVariableIfPresent(String name) {
-        return SaladContext.getContext().getVariableIfPresent(name);
+        return getContext().getVariableIfPresent(name);
     }
 
     public static void clearScenarioVariables() {
-        SaladContext.getContext().getScenarioVariables().clear();
+        getContext().getScenarioVariables().clear();
     }
 
     public static String getCurrentFeature() {
-        return SaladContext.getContext().getCurrentFeature();
+        return getContext().getCurrentFeature();
     }
 
     public static void setCurrentFeature(String featureUri) {
-        SaladContext.getContext().setCurrentFeature(featureUri);
+        getContext().setCurrentFeature(featureUri);
     }
 
     public static void clearFeatureVariables() {
-        SaladContext.getContext().getFeatureVariables().clear();
+        getContext().getFeatureVariables().clear();
     }
 
     public static String convertToJsonString(Object object) {
@@ -624,4 +629,23 @@ public class SaladCommands {
         }
         return body;
     }
+
+    public static void alert(String action) {
+        AlertUtils.alert(action);
+    }
+
+    public static void switchWindow() {
+        String currentWindow = getDriver().getWindowHandle();
+        String windowHandle = getDriver().getWindowHandles().stream()
+                .filter(window -> !window.equals(currentWindow))
+                .findFirst()
+                .orElseThrow(() -> new CucumberException("No other window to switch"));
+
+        getDriver().switchTo().window(windowHandle);
+    }
+
+    public static void switchWindow(String windowHandle) {
+        getDriver().switchTo().window(windowHandle);
+    }
+
 }
