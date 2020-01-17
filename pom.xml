@@ -12,13 +12,6 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
-    <repositories>
-        <!-- Repository for ORACLE ojdbc6. -->
-        <repository>
-            <id>codelds</id>
-            <url>https://code.lds.org/nexus/content/groups/main-repo</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -97,12 +90,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>5.2.5.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.3</version>
+            <version>5.3.7.Final</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -136,16 +124,21 @@
             <version>2.3.0</version>
         </dependency>
     </dependencies>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/gopyyn/Salad</url>
+        </repository>
+    </distributionManagement>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>RELEASE</version>
+                <version>2.22.0</version>
                 <configuration>
                     <argLine>-Dcucumber</argLine>
-                    <skip>false</skip>
-                    <skipTests>false</skipTests>
                     <failIfNoTests>false</failIfNoTests>
                     <includes>
                         <include>**/*Test.java</include>
