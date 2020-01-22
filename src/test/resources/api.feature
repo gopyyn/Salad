@@ -15,6 +15,12 @@ Feature: rest api
     And match "${response.status}" == "200"
 
   @compile
+  Scenario: update user with request from file
+    When put "https://jsonplaceholder.typicode.com/posts/1" "resources:request/testRequest.json"
+    Then print "response is ${response}"
+    And match "${response.status}" == "200"
+
+  @compile
   Scenario: get user
     When get "${rest-host}/posts/1"
     Then print "response is ${response}"

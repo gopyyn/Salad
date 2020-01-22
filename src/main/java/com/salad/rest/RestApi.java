@@ -11,9 +11,9 @@ import java.util.Map;
 
 import static com.salad.core.SaladCommands.parseString;
 import static com.salad.core.SaladCommands.readDataFromFile;
-import static java.util.Optional.ofNullable;
 import static org.apache.commons.codec.binary.Base64.encodeBase64String;
 import static org.apache.commons.codec.digest.DigestUtils.md5;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class RestApi {
 
@@ -25,7 +25,9 @@ public class RestApi {
     public static Response post(String url, String body) {
         url = parseString(url);
         String parsedBody = parseString(readDataFromFile(body));
-        ofNullable(body).ifPresent(dlr -> headers.put("Content-MD5", getMd5(parsedBody)));
+        if (isNotEmpty(body)) {
+            headers.put("Content-MD5", getMd5(parsedBody));
+        }
 
         HttpRequestWithBody post = Unirest.post(url);
 
@@ -39,7 +41,9 @@ public class RestApi {
     public static Response put(String url, String body) {
         url = parseString(url);
         String parsedBody = parseString(readDataFromFile(body));
-        ofNullable(body).ifPresent(dlr -> headers.put("Content-MD5", getMd5(parsedBody)));
+        if (isNotEmpty(body)) {
+            headers.put("Content-MD5", getMd5(parsedBody));
+        }
 
         HttpRequestWithBody put = Unirest.put(url);
 

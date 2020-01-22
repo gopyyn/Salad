@@ -676,8 +676,12 @@ public class SaladCommands {
     }
 
     public static String readDataFromFile(String body) {
-        if (body.startsWith("resource:")) {
-            final String fileName = substringAfter(body, "resource:");
+        if (isEmpty(body)) {
+            return "";
+        }
+
+        if (body.startsWith("resources:")) {
+            final String fileName = substringAfter(body, "resources:");
             try {
                 return FileUtils.readFileToString(new File(RestApi.class.getClassLoader().getResource(fileName).toURI()));
             } catch (URISyntaxException |IOException e) {

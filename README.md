@@ -291,7 +291,7 @@ Scenario: switch window to main page
 ```
 ## `fill page`
 #### fill page with list of provided values
-fill page "\<json key value>" or fill page "resource:jsonFilePath"
+fill page "\<json key value>" or fill page "resources:jsonFilePath"
 <br>key - element selector (CSS,Xpath, display text etc)
 <br>value - value to be entered on the page
 ```cucumber
@@ -299,7 +299,7 @@ Scenario: fill page
     Given fill page "{"Lease": "click", "Last:": "##string", "First:": "##string", "SSN:": "##numeric(9)", "ZIP:": "##numeric(5)"}"
     
 Scenario: fill page from json file
-    Given fill page "resource:json/web_fill_page.json"
+    Given fill page "resources:json/web_fill_page.json"
 ```
 
 ## `setValue`
@@ -331,7 +331,7 @@ Scenario: post body to a rest url
     * def "customerId" = "${response.body.id}"
     
 Scenario: post body from file to a rest url
-    When post "${hostname}/api/salad/customer" "resource:json/customerRequest.json"
+    When post "${hostname}/api/salad/customer" "resources:json/customerRequest.json"
     Then match "${response.status}" == "200"
 ```
 ## `put`
@@ -346,7 +346,7 @@ Scenario: put body to a rest url
     * def "customerId" = "${response.body.id}"
     
 Scenario: put body from file to a rest url
-    When post "${hostname}/api/salad/customer/1" "resource:json/customerRequest.json"
+    When post "${hostname}/api/salad/customer/1" "resources:json/customerRequest.json"
     Then match "${response.status}" == "200"
 ```
 ## `get`
