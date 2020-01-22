@@ -119,22 +119,4 @@ public enum Browser {
             }
         }
     }
-
-    public boolean isRunningLogSkip(String skippedCheckDescription, Logger logger) {
-        if (detect() == this) {
-            String browserName = name();
-            logger.info("Skipping '{}' check; running {}", skippedCheckDescription, browserName);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean isRunningElseLogSkip(String skippedCheckDescription, Logger logger) {
-        if (detect() == this) {
-            return true;
-        }
-        String browserName = name();
-        logger.info("Skipping '{}' check; not running {}", skippedCheckDescription, browserName);
-        return false;
-    }
 }

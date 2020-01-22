@@ -38,7 +38,6 @@ import java.util.Map;
 
 import static com.salad.core.SaladContext.getContext;
 import static com.salad.enums.SelectorType.TEXT;
-import static com.salad.enums.TimeUnit.SECOND;
 import static com.salad.enums.TimeUnit.getDuration;
 import static com.salad.enums.VerifyType.PAGELOAD;
 import static com.salad.enums.VerifyType.VISIBLE;
@@ -367,21 +366,6 @@ public class SaladCommands {
 
     public static void assertPageUrl(String url) {
         assertThat(getDriver().getCurrentUrl()).contains(parseString(url));
-    }
-
-    public static void login(String userId, String password, String dealerId) throws InterruptedException {
-        goTo(parseString("${hostname}/Web/R1Login.jsp"));
-        inputCss("input[name=j_username]", parseString(userId));
-        inputCss("input[name=j_password]", parseString(password));
-        safeClick(".btn-success");
-        wait(1, SECOND);
-        if (dealerId == null || getDriver().getCurrentUrl().contains("/Web/common/DealerUserEntry.do")) {
-            return;
-        }
-        safeClick(".dropdown-toggle");
-        safeClick(parseString(dealerId));
-        safeClick(".btn-success");
-        wait(1, SECOND);
     }
 
     public static void set(String name, String value) {

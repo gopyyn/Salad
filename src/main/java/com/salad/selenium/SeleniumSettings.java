@@ -18,7 +18,6 @@ import java.net.URL;
 public abstract class SeleniumSettings {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumSettings.class);
-	public static final String SELENIUM_BASE_URL = "selenium.base.url";
 	public static final String MALFORMED_URL_EXCEPTION = "Malformed URL Exception";
 
 	private SeleniumSettings(){
@@ -33,7 +32,7 @@ public abstract class SeleniumSettings {
 	}
 
 	public static String gridHost() {
-		return System.getProperty("selenium.host", "jenkins.r1dev.com");
+		return System.getProperty("selenium.host", "localhost");
 	}
 
 	public static Integer gridPort() {

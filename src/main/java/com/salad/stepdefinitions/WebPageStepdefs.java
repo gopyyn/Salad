@@ -76,16 +76,6 @@ public class WebPageStepdefs {
         SaladCommands.verifyElement(expression, VerifyType.fromValue(condition));
     }
 
-    @Given("login {string} {string} {string}")
-    public void login(String userId, String password, String dealerId) throws InterruptedException {
-        SaladCommands.login(userId, password, dealerId);
-    }
-
-    @Given("login {string} {string}")
-    public void login(String userId, String password) throws InterruptedException {
-        SaladCommands.login(userId, password, null);
-    }
-
     @And("fill page \"(.+)\"$")
     public void fillPage(String data) {
         SaladCommands.fillPage(data);
