@@ -5,12 +5,12 @@ import cucumber.api.java.en.Given;
 
 public class RestApiStepdefs {
 
-    @Given("post \"(.+)\" \"(.+)\"")
+    @Given("post \"(.+)\" \"(.+)?\"")
     public void post(String url, String body) {
         RestApi.post(url, body);
     }
 
-    @Given("put \"(.+)\" \"(.+)\"")
+    @Given("put \"(.+)\" \"(.+)?\"")
     public void put(String url, String body) {
         RestApi.put(url, body);
     }
