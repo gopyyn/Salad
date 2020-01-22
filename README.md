@@ -23,7 +23,7 @@ Salad will provide predefined step-definitions which can be used in the existing
   <th>Web-ui Commands</th>
   <td>
       <a href="#goto">goto</a> 
-      <a href="#enter">enter</a> 
+    | <a href="#enter">enter</a> 
     | <a href="#select">select</a>
     | <a href="#click">click</a>
     | <a href="#displays">displays</a>
@@ -42,8 +42,8 @@ Salad will provide predefined step-definitions which can be used in the existing
   <th>Rest api Commands</th>
   <td>
       <a href="#post">post</a> 
-      <a href="#put">put</a> 
-      <a href="#get">get</a> 
+      | <a href="#put">put</a> 
+      | <a href="#get">get</a> 
   </td>
 </tr>
 <tr>
@@ -64,7 +64,7 @@ Salad will provide predefined step-definitions which can be used in the existing
     | <a href="#inbuilt-java-utilities">inbuilt java utilities</a>
   </td>
 </tr>
-<table>
+</table>
 
 ## Getting Started
 Salad requires [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) 8 (at least version 1.8.0_112 or greater) and then either [Maven](http://maven.apache.org), [Eclipse](#eclipse-quickstart) or [IntelliJ](https://github.com/intuit/Cucumber-Salad/wiki/IDE-Support#intellij-community-edition) to be installed.
@@ -76,7 +76,7 @@ you just need one `<dependency>`:
 <dependency>
     <groupId>com.salad</groupId>
     <artifactId>cucumber-salad</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -84,42 +84,77 @@ you just need one `<dependency>`:
 Alternatively for [Gradle](https://gradle.org) you need one entries:
 
 ```yml
-    testCompile 'com.salad:cucumber-salad:0.0.1'
+    testCompile 'com.salad:cucumber-salad:1.0.2'
 ```
 
 ## Quickstart
 Cucumber-Salad embrace the cucumber framework. 
-* configure properties [optional]
-* Add the *.feature file
-* Add the glue to cucumber test __"glue = {"com.salad.stepdefinitions"}"__
+* Configuration yaml file [optional]
+* Cucumber feature file
+* Cucumber Java Test File (Add the glue to cucumber test __"glue = {"com.salad.stepdefinitions"}"__)
 
 #### Configuration
-All the environment variables should be specified in the __"resources/config/\<environment>.yaml"__ file. 
-The environment should be supplied as the VM arguments.
+The configuration should be written in YAML format under __"resources/config/\<environment>.yaml"__
+All the environment variables should be specified in the file. 
+>The environment should be supplied as the VM arguments.
 Example ```-Denvironment=qa```
 > If environment is not specified then it will default to qa
 
+The configuration is in YAML format and it has 3 major section
+ * system -> specify all the system properties here. If not provided then default to chrome browser
+ * hibernate -> database connection details. Only needed if connection to Database
+ * global -> all the properties that are used in the tests. These will be available as variables
 ##### Example
 src/test/resources/config/qa.yaml
 ```
-url=https://salad.com
-userId=testuserId
-password=!password987
-```
+system:
+  selenium.browser: chrome
+  webdriver.chrome.driver: C:\selenium\chromedriver.exe
+  # selenium.remote: false
+  # selenium.host: remote-hostname.com
+  # selenium.port: 4444
 
-#### Creating the test
+hibernate:
+  hibernate.connection.driver_class: org.h2.Driver
+  hibernate.connection.url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1
+  hibernate.connection.username: ""
+  hibernate.connection.password: ""
+  hibernate.dialect: org.hibernate.dialect.H2Dialect
+  hibernate.default_schema: PUBLIC
+  hibernate.show_sql: true
+
+global:
+  userId: testUserId
+  password: somepassword@123
+  rest-host: https://jsonplaceholder.typicode.com
+```
+#### Cucumber feature file
+Cucumber feature are technically in 'Gherkin' format - but all you need to understand intuitively as someone who needs to test web are the three sections: Feature, Background and Scenario. There can be multiple Scenario-s in a *.feature file, and at least one should be present. The Background is optional.
+
+Lines that start with a # are comments.
+```
+Feature: brief description of what is being tested
+    more lines of description if needed.
+
+Background:
+  # this section is optional !
+  # steps here are executed before each Scenario in this file
+  # variables defined here will be 'global' to all scenarios
+  # and will be re-initialized before every scenario
+  
+Scenario: brief description of this scenario
+  # steps for this scenario
+
+Scenario: a different scenario
+  # steps for this other scenari
+```
+#### Cucumber Java Test File
+A java test file which can be run either as Junit or TestNG test. 
+Salad framework provide **CucumberSaladJunit** and **CucumberSaladTestng** which can be extended by the java test
+All the reports of the test will be under _"target/cucumber-reports"_
 ##### Example
 ###### JUnit Test
 > @CucumberOptions is from package cucumber.api.CucumberOptions;
-```java
-@RunWith(Cucumber.class)
-@CucumberOptions(plugin = {"pretty", "html:target/cucumber-reports"},
-        features={"src/test/resources/login.feature"},
-        glue = {"com.salad.stepdefinitions"})
-public class WebUITest {
-}
-```
-##### OR
 ```java
 @CucumberOptions(features={"src/test/resources"})
 public class WebUITest extends CucumberSaladJunit {
@@ -143,27 +178,6 @@ public class WebUITest extends CucumberSaladTestng {
         return super.scenarios();
     }
 }
-```
-#### Script Structure
-Cucumber scripts are technically in 'Gherkin' format - but all you need to understand intuitively as someone who needs to test web are the three sections: Feature, Background and Scenario. There can be multiple Scenario-s in a *.feature file, and at least one should be present. The Background is optional.
-
-
-Lines that start with a # are comments.
-```
-Feature: brief description of what is being tested
-    more lines of description if needed.
-
-Background:
-  # this section is optional !
-  # steps here are executed before each Scenario in this file
-  # variables defined here will be 'global' to all scenarios
-  # and will be re-initialized before every scenario
-  
-Scenario: brief description of this scenario
-  # steps for this scenario
-
-Scenario: a different scenario
-  # steps for this other scenari
 ```
 
 ## Web-ui Commands

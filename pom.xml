@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.salad</groupId>
     <artifactId>cucumber-salad</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <properties>
         <cucumber.version>4.3.1</cucumber.version>
@@ -124,13 +124,13 @@
             <version>2.3.0</version>
         </dependency>
     </dependencies>
-<!--    <distributionManagement>-->
-<!--        <repository>-->
-<!--            <id>github</id>-->
-<!--            <name>GitHub OWNER Apache Maven Packages</name>-->
-<!--            <url>https://maven.pkg.github.com/gopyyn/Salad</url>-->
-<!--        </repository>-->
-<!--    </distributionManagement>-->
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/gopyyn/Salad</url>
+        </repository>
+    </distributionManagement>
     <build>
         <plugins>
             <plugin>
