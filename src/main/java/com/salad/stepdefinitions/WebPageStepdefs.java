@@ -32,7 +32,7 @@ public class WebPageStepdefs {
 
     @Given("^click \"(.+)\"")
     public void click(String name) {
-       SaladCommands.click(name);
+       SaladCommands.safeClick(name);
     }
 
     @And("wait ([a-zA-Z0-9_]+) (.+)")

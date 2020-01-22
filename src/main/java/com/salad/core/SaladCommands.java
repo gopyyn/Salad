@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -42,9 +43,11 @@ import static com.salad.enums.TimeUnit.getDuration;
 import static com.salad.enums.VerifyType.PAGELOAD;
 import static com.salad.enums.VerifyType.VISIBLE;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 import static org.openqa.selenium.support.ui.ExpectedConditions.invisibilityOfAllElements;
 import static org.openqa.selenium.support.ui.Sleeper.SYSTEM_SLEEPER;
 
@@ -53,6 +56,13 @@ public class SaladCommands {
     public static final String SPECIAL_CHARACTER_REGEX = "[^a-zA-Z0-9 _-]";
     public static final ObjectMapper mapper = new ObjectMapper();
     private static final int ONE_SECOND = 1;
+    private static final int MIN_WAIT_SECONDS = 5;
+    private static final List CLICKABLE_ELEMENTS = asList("button", "input", "select", "a", "textarea", "fieldset");
+    private static final String SALAD_JS;
+
+    static {
+        SALAD_JS = getSaladJs();
+    }
 
     private SaladCommands() {
     }
@@ -119,6 +129,7 @@ public class SaladCommands {
     }
 
     private static void enter(WebElement inputElement, String value) {
+        shortWaitForElementToBeClickable(inputElement);
         if ("select".equalsIgnoreCase(inputElement.getTagName())) {
             new Select(inputElement).selectByVisibleText(parseString(value));
         } else if ("checkbox".equalsIgnoreCase(inputElement.getAttribute("type")) ||
@@ -128,6 +139,19 @@ public class SaladCommands {
             inputElement.sendKeys(parseString(value));
             inputElement.sendKeys(Keys.TAB);
         }
+    }
+
+
+    private static void shortWaitForElementToBeClickable(String locator) {
+        Waits waits = Waits.using(getDriver());
+        waits.forPageLoad();
+        waits.searchingWait(MIN_WAIT_SECONDS).until(elementToBeClickable(new Selector(locator).getBy()));
+    }
+
+    private static void shortWaitForElementToBeClickable(WebElement element) {
+        Waits waits = Waits.using(getDriver());
+        waits.forPageLoad();
+        waits.searchingWait(MIN_WAIT_SECONDS).until(elementToBeClickable(element));
     }
 
     public static void select(String displayName, String value) {
@@ -200,8 +224,50 @@ public class SaladCommands {
         enter(element, value);
     }
 
-    public static void click(String name) {
-        getElement(parseString(name)).click();
+    public static void safeClick(String name) {
+        try {
+            click(name);
+        } catch (RuntimeException e) {
+            shortWaitForElementToBeClickable(name);
+            click(name);
+        }
+    }
+
+    private static void click(String name) {
+        WebElement clickableElement = getElements(parseString(name)).stream()
+                .filter(WebElement::isDisplayed)
+                .sorted(Comparator.comparing((element)-> isClickable(element)? 0 : 1))
+                .findFirst()
+                .orElseThrow(() -> new CucumberException(format("Unable to find clickable %s", name)));
+
+        clickableElement.click();
+        runSaladScript(SALAD_JS);
+    }
+
+    private static boolean isClickable(WebElement element) {
+        return CLICKABLE_ELEMENTS.contains(element.getTagName());
+    }
+
+    private static String getSaladJs() {
+        try {
+            return FileUtils.readFileToString(new File(SaladContext.class.getClassLoader().getResource("js/salad.js").getPath()));
+        } catch (RuntimeException| IOException e) {
+            LOGGER.error("unable to run the javascript file", e);
+            return null;
+        }
+    }
+
+    private static Boolean runSaladScript(String quiesceScript) {
+        if (quiesceScript == null) {
+            return false;
+        }
+
+        try {
+            return (Boolean) getDriver().executeScript(quiesceScript);
+        } catch (WebDriverException e) {
+            LOGGER.error("unable to run ", e);
+            return false;
+        }
     }
 
     public static void wait(long waitTime, TimeUnit unit) throws InterruptedException {
@@ -307,14 +373,14 @@ public class SaladCommands {
         goTo(parseString("${hostname}/Web/R1Login.jsp"));
         inputCss("input[name=j_username]", parseString(userId));
         inputCss("input[name=j_password]", parseString(password));
-        click(".btn-success");
+        safeClick(".btn-success");
         wait(1, SECOND);
         if (dealerId == null || getDriver().getCurrentUrl().contains("/Web/common/DealerUserEntry.do")) {
             return;
         }
-        click(".dropdown-toggle");
-        click(parseString(dealerId));
-        click(".btn-success");
+        safeClick(".dropdown-toggle");
+        safeClick(parseString(dealerId));
+        safeClick(".btn-success");
         wait(1, SECOND);
     }
 
