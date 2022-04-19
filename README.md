@@ -31,7 +31,7 @@ Salad will provide predefined step-definitions which can be used in the existing
     | <a href="#displays">displays</a>
     | <a href="#onpage">onPage</a>
     | <a href="#wait">wait</a>
-    | <a href="#waitUntil">waitUntil</a>
+    | <a href="#wait until">wait until</a>
     | <a href="#hoverandclick">hoverAndClick</a>
     | <a href="#fill-page">fill page</a>
     | <a href="#setValue">setValue</a>
@@ -262,23 +262,23 @@ Scenario: assert landed on customer page
 ```
 ## `wait`
 #### wait for given amount of time
-wait \<number> <MILLI_SECOND|SECOND|MINITE|HOUR>
+wait \<number> <MILLI_SECONDS|SECONDS|MINUTES|HOURS>
 ```cucumber
 Scenario: wait for 1 second
-    Given wait 1 SECOND
-    Given wait 500 MILLI_SECOND
+    Given wait 1 SECONDS
+    Given wait 500 MILLI_SECONDS
 ```
-## `waitUntil`
+## `wait until`
 #### wait until certain condition is met
-waitUntil \<selector> [is] <visible|not visible(or !visible)|clickable|not clickable(or !clickable)|enabled|disabled(or !enabled/not enabled)>
+wait until \<selector> [is] <visible|not visible(or !visible)|clickable|not clickable(or !clickable)|enabled|disabled(or !enabled/not enabled)>
 <br>OR
-<br>waitUntil PAGELOAD
+<br>wait until PAGELOAD
 >you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
 ```cucumber
 Scenario: wait for 1 second
-    Given waitUntil PAGELOAD
-    And waitUntil ".app-vehicle-edit-save-btn" is not visible
-    And waitUntil ".app-vehicle-edit-btn" VISIBLE
+    Given wait until PAGELOAD
+    And wait until ".save-btn" is not visible
+    And wait until ".edit-btn" VISIBLE
 ```
 ## `hoverAndClick`
 #### hover a text and click from the drop down

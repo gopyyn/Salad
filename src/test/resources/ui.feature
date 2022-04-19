@@ -6,7 +6,8 @@ Feature: Demo Login Page
     And enter "Email" "user@phptravels.com"
     And enter "Password" "demouser123"
     When click "Login"[3]
-    And wait 2 SECOND
+    And wait 2 SECONDS
+    And wait until "Please enter your account credentials below" is VISIBLE
     Then verify "Please enter your account credentials below" is VISIBLE
 
   @compile
@@ -15,7 +16,7 @@ Feature: Demo Login Page
     And enter "Email" "user@phptravels.com"
     And enter "Password" "demouser"
     When click "Login"[3]
-    And wait 2 SECOND
+    And wait until PAGELOAD
     Then verify "Wallet Balance" is VISIBLE
     And click "My Profile"
     And verify "name=email" == "user@phptravels.com"

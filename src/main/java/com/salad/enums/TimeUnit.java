@@ -5,19 +5,19 @@ import java.time.Duration;
 import static java.time.Duration.*;
 
 public enum TimeUnit {
-    MILLI_SECOND,
-    SECOND,
-    MINUTE,
-    HOUR;
+    MILLI_SECONDS,
+    SECONDS,
+    MINUTES,
+    HOURS;
 
 
     public static final Duration getDuration(long time, TimeUnit unit) {
         switch (unit) {
-            case SECOND:
+            case SECONDS:
                 return ofSeconds(time);
-            case MINUTE:
+            case MINUTES:
                 return ofMinutes(time);
-            case HOUR:
+            case HOURS:
                 return ofHours(time);
             default:
                 return ofMillis(time);

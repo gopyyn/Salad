@@ -42,22 +42,30 @@ public class WebPageStepdefs {
         SaladCommands.safeClick(name, nthOccurrence);
     }
 
-    @And("wait {int} {timeUnit}")
+//    @And("wait {int} {timeUnit}") //commented as cucumber java plugin is not showing all matchType options
+    @And("^wait (\\d+) (SECONDS|MINUTES|HOURS)$")
+    @And("^wait (\\d+) (MILLI_SECONDS)$")
     public void wait(long waitTime, TimeUnit unit) throws InterruptedException {
         SaladCommands.wait(waitTime, unit);
     }
 
-    @And("waitUntil {anyOrAll} {string} is/was {verifyType}")
+//    @And("wait until {anyOrAll} {string} is {verifyType}") //commented as cucumber java plugin is not showing all matchType options
+    @When("^wait until (ANY|ALL)? \"(.+)\" (?:is)? (CLICKABLE|VISIBLE|INVISIBLE|ENABLED|DISABLED)$")
     public void waitUntil(MatchType matchType, String text, VerifyType type) {
         SaladCommands.waitUntilForElements(text, matchType, type);
     }
 
-    @And("waitUntil {string} is/was {verifyType}")
-    public void waitUntil(String text, VerifyType condition) {
-        SaladCommands.waitUntil(text, condition);
+//    @And("waitUntil {string} is/was {verifyType}") //commented as cucumber java plugin is not showing all matchType options
+    @When("^wait until \"(.+)\" (?:is)? (CLICKABLE|VISIBLE|INVISIBLE|ENABLED|DISABLED)$")
+    @When("^wait until \"(.+)\" (?:is)? (!VISIBLE)$")
+    @When("^wait until \"(.+)\" (?:is)? (!ENABLED)$")
+    @When("^wait until \"(.+)\" (?:is)? (!CLICKABLE)$")
+    @When("^wait until \"(.+)\" (?:is)? (NOT_CLICKABLE)$")
+    public void waitUntil(String text, String condition) {
+        SaladCommands.waitUntil(text, VerifyType.fromValue(condition));
     }
 
-    @And("waitUntil {string}")
+    @And("^wait until (PAGELOAD)$")
     public void waitUntil(VerifyType type) throws InterruptedException {
         SaladCommands.waitUntil(type);
     }
@@ -86,7 +94,7 @@ public class WebPageStepdefs {
         SaladCommands.match(lhs, MatchType.fromValue(operators), rhs);
     }
 
-//    @When("verify {string} (is) {verifyType}") //commented as cucumber java plugin is not showing all verifyType options
+//    @When("verify {string} (is) {verifyType}") //commented as cucumber java plugin is not showing all parameterType options
     @When("^verify \"(.+)\" (?:is)? (CLICKABLE|VISIBLE|INVISIBLE|ENABLED|DISABLED)$")
     @When("^verify \"(.+)\" (?:is)? (!VISIBLE)$")
     @When("^verify \"(.+)\" (?:is)? (!ENABLED)$")
@@ -121,25 +129,25 @@ public class WebPageStepdefs {
         SaladCommands.switchWindow(windowName);
     }
 
-    @ParameterType("MILLI_SECOND|SECOND|MINUTE|HOUR")
-    public TimeUnit timeUnit(String timeUnit) {
-        return TimeUnit.valueOf(timeUnit);
-    }
+//    @ParameterType("MILLI_SECOND|SECOND|MINUTE|HOUR")
+//    public TimeUnit timeUnit(String timeUnit) {
+//        return TimeUnit.valueOf(timeUnit);
+//    }
 
-    @ParameterType("PAGELOAD|CLICKABLE|NOT_CLICKABLE|!CLICKABLE|VISIBLE|INVISIBLE|!VISIBLE|ENABLED|DISABLED|!ENABLED")
-    public VerifyType verifyType(String condition) {
-        return VerifyType.fromValue(condition);
-    }
+//    @ParameterType("PAGELOAD|CLICKABLE|NOT_CLICKABLE|!CLICKABLE|VISIBLE|INVISIBLE|!VISIBLE|ENABLED|DISABLED|!ENABLED")
+//    public VerifyType verifyType(String condition) {
+//        return VerifyType.fromValue(condition);
+//    }
 
-    @ParameterType("EQUALS|==|NOT_EQUALS|!=|CONTAINS|contains|NOT_CONTAINS|!contains|GREATER_THAN|>|LESS_THAN|<|GREATER_THAN_OR_EQUAL_TO|>=|LESS_THAN_OR_EQUAL_TO|<=|ANY|ALL")
-    public MatchType matchType(String matchType) {
-        return MatchType.fromValue(matchType);
-    }
+//    @ParameterType("EQUALS|==|NOT_EQUALS|!=|CONTAINS|contains|NOT_CONTAINS|!contains|GREATER_THAN|>|LESS_THAN|<|GREATER_THAN_OR_EQUAL_TO|>=|LESS_THAN_OR_EQUAL_TO|<=|ANY|ALL")
+//    public MatchType matchType(String matchType) {
+//        return MatchType.fromValue(matchType);
+//    }
     
-    @ParameterType("ANY|ALL")
-    public MatchType anyOrAll(String matchType) {
-        return MatchType.fromValue(matchType);
-    }
+//    @ParameterType("ANY|ALL")
+//    public MatchType anyOrAll(String matchType) {
+//        return MatchType.fromValue(matchType);
+//    }
 }
 
 
