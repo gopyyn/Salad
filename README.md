@@ -74,6 +74,7 @@ you just need one `repository` and `<dependency>`:
 
 ```xml
 <repositories>
+   ...
    <repository>
       <id>jitpack.io</id>
       <url>https://jitpack.io</url>
@@ -81,6 +82,7 @@ you just need one `repository` and `<dependency>`:
 </repositories>
 
 <dependencies>
+   ...
    <dependency>
       <groupId>com.github.gopyyn</groupId>
       <artifactId>Salad</artifactId>
@@ -93,11 +95,17 @@ you just need one `repository` and `<dependency>`:
 Alternatively for [Gradle](https://gradle.org) you need one entries:
 
 ```yml
-    testCompile 'com.salad:cucumber-salad:1.0.2'
+   repositories {
+      ...
+      maven {
+        url "https://jitpack.io"
+      }
+   }
+   testCompile 'com.github.gopyyn:salad:1.0.4'
 ```
 
 ## Quickstart
-Cucumber-Salad embrace the cucumber framework. 
+Salad embrace the cucumber framework. 
 * Configuration yaml file [optional]
 * Cucumber feature file
 * Cucumber Java Test File (Add the glue to cucumber test __"glue = {"com.salad.stepdefinitions"}"__)
@@ -110,7 +118,8 @@ Example ```-Denvironment=qa```
 > If environment is not specified then it will default to qa
 
 The configuration is in YAML format and it has 3 major section
- * system -> specify all the system properties here. If not provided then default to chrome browser
+ * system -> specify all the system properties here. If not provided then default to headless Chrome browser
+   * selenium.browser values are INTERNETEXPLORER, FIREFOX, CHROME, EDGE, OPERA, SAFARI, HEADLESS (chrome with headless)
  * hibernate -> database connection details. Only needed if connection to Database
  * global -> all the properties that are used in the tests. These will be available as variables
 ##### Example
@@ -118,7 +127,6 @@ src/test/resources/config/qa.yaml
 ```
 system:
   selenium.browser: chrome
-  webdriver.chrome.driver: C:\selenium\chromedriver.exe
   # selenium.remote: false
   # selenium.host: remote-hostname.com
   # selenium.port: 4444

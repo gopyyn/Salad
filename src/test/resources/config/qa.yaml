@@ -1,5 +1,5 @@
 system:
-  selenium.browser: PHANTOM
+  selenium.browser: HEADLESS
 
 hibernate:
   hibernate.connection.driver_class: org.h2.Driver

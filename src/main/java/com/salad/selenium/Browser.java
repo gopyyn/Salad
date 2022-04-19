@@ -31,10 +31,9 @@ public enum Browser {
     INTERNETEXPLORER(InternetExplorerDriver.class, new InternetExplorerOptions()),
     FIREFOX(FirefoxDriver.class, new FirefoxOptions()),
     CHROME(ChromeDriver.class, new ChromeOptions()),
-    HEADLESS(ChromeDriver.class, new ChromeOptions().addArguments("headless")),
+    HEADLESS(ChromeDriver.class, new ChromeOptions().setHeadless(true).addArguments("--window-size=1400,600")),
     EDGE(EdgeDriver.class, new EdgeOptions()),
     OPERA(OperaDriver.class, new OperaOptions()),
-    PHANTOM(PhantomJSDriver.class, new DesiredCapabilities()),
     SAFARI(SafariDriver.class, new SafariOptions());
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Browser.class);
@@ -96,15 +95,10 @@ public enum Browser {
             case CHROME:
                 WebDriverManager.chromedriver().setup();
                 return new ChromeDriver((ChromeOptions) capabilities);
-            case PHANTOM:
-                System.setProperty("phantomjs.binary.path", Browser.class.getResource("/lib/phantomjs").getPath());
-                return new PhantomJSDriver();
             case HEADLESS:
             default:
                 WebDriverManager.chromedriver().setup();
-                ChromeOptions capabilities = (ChromeOptions) this.capabilities;
-                capabilities.setHeadless(true);
-                return new ChromeDriver(capabilities);
+                return new ChromeDriver((ChromeOptions) HEADLESS.capabilities);
         }
     }
 
