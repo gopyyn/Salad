@@ -70,14 +70,23 @@ Salad will provide predefined step-definitions which can be used in the existing
 Salad requires [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) 8 (at least version 1.8.0_112 or greater) and then either [Maven](http://maven.apache.org), [Eclipse](#eclipse-quickstart) or [IntelliJ](https://github.com/intuit/Cucumber-Salad/wiki/IDE-Support#intellij-community-edition) to be installed.
 
 ## Maven
-you just need one `<dependency>`:
+you just need one `repository` and `<dependency>`:
 
 ```xml
-<dependency>
-    <groupId>com.salad</groupId>
-    <artifactId>cucumber-salad</artifactId>
-    <version>1.0.2</version>
-</dependency>
+<repositories>
+   <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+   </repository>
+</repositories>
+
+<dependencies>
+   <dependency>
+      <groupId>com.github.gopyyn</groupId>
+      <artifactId>Salad</artifactId>
+      <version>1.0.4</version>
+    </dependency>
+</dependencies>
 ```
 
 ## Gradle
