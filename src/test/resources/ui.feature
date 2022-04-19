@@ -2,16 +2,20 @@ Feature: Demo Login Page
 
   @compile
   Scenario: Demo login with invalid credentials
-    Given goto "https://s2.demo.opensourcecms.com/orangehrm/symfony/web/index.php/auth/login"
-    And enter "Username" "abcd@gmail.com"
-    And enter "Password" "testPassword"
-    And click "LOGIN"
-    Then verify "Invalid credentials" is visible
+    Given goto "http://www.phptravels.net/login"
+    And enter "Email" "user@phptravels.com"
+    And enter "Password" "demouser123"
+    When click "Login"[3]
+    And wait 2 SECOND
+    Then verify "Please enter your account credentials below" is VISIBLE
 
   @compile
   Scenario: Demo login with valid credentials
-    Given goto "https://s2.demo.opensourcecms.com/orangehrm/symfony/web/index.php/auth/login"
-    And enter "Username" "opensourcecms"
-    And enter "Password" "opensourcecms"
-    And click "LOGIN"
-    Then verify "Welcome Admin" is visible
+    Given goto "http://www.phptravels.net/login"
+    And enter "Email" "user@phptravels.com"
+    And enter "Password" "demouser"
+    When click "Login"[3]
+    And wait 2 SECOND
+    Then verify "Wallet Balance" is VISIBLE
+    And click "My Profile"
+    And verify "name=email" == "user@phptravels.com"

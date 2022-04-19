@@ -214,7 +214,7 @@ Scenario: enter user id and password
 ## `select`
 #### select a value from dropdown
 select "\<selector>" "value"
->you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selections
+>you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
 
 ```cucumber
 Scenario: enter user id and password
@@ -223,7 +223,7 @@ Scenario: enter user id and password
 ```
 ## `click`
 #### Click the HTML element
->you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selections
+>you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
 ```cucumber
 Scenario: click using display text, css, xpath
     And click "Log In"
@@ -232,7 +232,7 @@ Scenario: click using display text, css, xpath
 ```
 ## `displays`
 #### assert the HTML element is displayed on the page
->you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selections
+>you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
 ```cucumber
 Scenario: assert a vin is displayed in the ui
     Then displays "VIN: 2T2ZZMCA6KC119068"
@@ -240,17 +240,19 @@ Scenario: assert a vin is displayed in the ui
 ```
 ## `verify`
 #### verify the HTML element value on the page
-verify "\<selector>" <operator> ["value"]
-<br>Valid operators are ==, !=, contains, !contains, <, <=, >, >=
-visible, invisible (or !visible), enabled, disabled ( or !enabled)
->you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selections
+1. verify "\<selector>" is \<operation>
+<br>Valid operators CLICKABLE, VISIBLE, INVISIBLE, ENABLED, DISABLED, !CLICKABLE, !VISIBLE, !ENABLED
+2. verify "\<selector>" \<match_operation> ["value"]
+    1. selector will give the value or text of the selected html tag
+    2. Valid match_operation are EQUALS, ==, NOT_EQUALS, !=, CONTAINS, contains, NOT_CONTAINS, !contains, GREATER_THAN, >, LESS_THAN, <, GREATER_THAN_OR_EQUAL_TO, >=, LESS_THAN_OR_EQUAL_TO
+>you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
 
 ```cucumber
 Scenario: assert a vin is displayed in the ui
     And verify "input#vin" == "2T2ZZMCA6KC119068"
 ## "is" is an optional text in the below text. it can be used for readability
-    And verify ".app-vehicle-edit-save-btn" is disabled
-    And verify ".app-vehicle-edit-save-btn" enabled
+    And verify ".save-btn" is DISABLED
+    And verify ".edit-btn" ENABLED
 ```
 ## `onPage`
 #### assert the current url of the browser
@@ -271,7 +273,7 @@ Scenario: wait for 1 second
 waitUntil \<selector> [is] <visible|not visible(or !visible)|clickable|not clickable(or !clickable)|enabled|disabled(or !enabled/not enabled)>
 <br>OR
 <br>waitUntil PAGELOAD
->you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selections
+>you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
 ```cucumber
 Scenario: wait for 1 second
     Given waitUntil PAGELOAD

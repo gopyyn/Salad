@@ -1,5 +1,5 @@
 system:
-  webdriver.chrome.driver: C:\dev\selenium\chromedriver.exe
+  selenium.browser: PHANTOM
 
 hibernate:
   hibernate.connection.driver_class: org.h2.Driver
