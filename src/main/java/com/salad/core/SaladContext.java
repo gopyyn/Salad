@@ -46,7 +46,7 @@ public class SaladContext {
             configProperties = mapper.readValue(file, Map.class);
 
         } catch (Exception e) {
-            LOGGER.error(format("unable to load configProperties from %s", propertyFileName), e);
+            LOGGER.error(e, () -> format("unable to load configProperties from %s", propertyFileName));
         }
     }
 
@@ -80,7 +80,7 @@ public class SaladContext {
                 properties.load(fis);
                 properties.stringPropertyNames().forEach(name -> globalVariables.put(name, properties.getProperty(name)));
             } catch (RuntimeException| IOException e) {
-                LOGGER.error(format("unable to load config from %s", propertyFileName), e);
+                LOGGER.error(e, () -> format("unable to load config from %s", propertyFileName));
             }
         });
     }

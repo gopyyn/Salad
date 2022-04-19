@@ -1,7 +1,7 @@
 package com.salad.stepdefinitions;
 
 import com.salad.rest.RestApi;
-import cucumber.api.java.en.Given;
+import io.cucumber.java.en.Given;
 
 public class RestApiStepdefs {
 

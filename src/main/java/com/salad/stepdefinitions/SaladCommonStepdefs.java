@@ -4,11 +4,11 @@ import com.salad.core.SaladCommands;
 import com.salad.selenium.Driver;
 import com.salad.utils.HibernateUtils;
 import com.salad.enums.MatchType;
-import cucumber.api.Scenario;
-import cucumber.api.java.After;
-import cucumber.api.java.Before;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.When;
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
 
 import java.util.Hashtable;
 
@@ -53,7 +53,7 @@ public class SaladCommonStepdefs {
         if (scenario.getUri().equals(SaladCommands.getCurrentFeature())) {
             return;
         }
-        SaladCommands.setCurrentFeature(scenario.getUri());
+        SaladCommands.setCurrentFeature(scenario.getUri().getPath());
         //clears previous feature variables
         SaladCommands.clearFeatureVariables();
         SaladCommands.cleanupDriver(scenario);
@@ -63,7 +63,7 @@ public class SaladCommonStepdefs {
     public void afterScenario(Scenario scenario) {
         if (Boolean.valueOf(SaladCommands.getVariableAsStringIfPresent("skip_browser_restart"))) {
             SaladCommands.takeSnapShot(scenario);
-            activeDrivers.putIfAbsent(scenario.getUri(), Driver.instance());
+            activeDrivers.putIfAbsent(scenario.getUri().getPath(), Driver.instance());
         } else {
             SaladCommands.cleanupDriver(scenario);
         }

@@ -1,6 +1,7 @@
 package com.salad.core;
 
-import cucumber.api.CucumberOptions;
+
+import io.cucumber.junit.CucumberOptions;
 import org.junit.BeforeClass;
 
 @CucumberOptions(features = {"src/test/resources/db.feature"}, tags = "@compile")

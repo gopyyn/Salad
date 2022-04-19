@@ -1,6 +1,6 @@
 package com.salad.enums;
 
-import cucumber.runtime.CucumberException;
+import io.cucumber.core.exception.CucumberException;
 
 import static java.lang.String.format;
 

@@ -1,5 +1,7 @@
 package com.salad.core;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import com.salad.enums.MatchType;
 import com.salad.enums.TimeUnit;
@@ -9,12 +11,10 @@ import com.salad.selenium.Driver;
 import com.salad.selenium.Waits;
 import com.salad.utils.AlertUtils;
 import com.salad.utils.Selector;
-import cucumber.api.Scenario;
-import cucumber.runtime.CucumberException;
+import io.cucumber.core.exception.CucumberException;
 import io.cucumber.core.logging.Logger;
 import io.cucumber.core.logging.LoggerFactory;
-import io.cucumber.datatable.dependency.com.fasterxml.jackson.core.JsonProcessingException;
-import io.cucumber.datatable.dependency.com.fasterxml.jackson.databind.ObjectMapper;
+import io.cucumber.java.Scenario;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
 import org.apache.commons.io.FileUtils;
@@ -27,14 +27,15 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.salad.core.SaladContext.getContext;
 import static com.salad.enums.SelectorType.TEXT;
@@ -181,7 +182,7 @@ public class SaladCommands {
         try {
             return getChild(element);
         } catch (RuntimeException e) {
-            LOGGER.debug("input element not available as child. Searching under sibling", e);
+            LOGGER.debug(e, () -> "input element not available as child. Searching under sibling");
             return getSibling(element);
         }
     }
@@ -191,9 +192,10 @@ public class SaladCommands {
             WebElement labelElement = getElement(By.xpath(format("//label[normalize-space()='%s']", selectorText)));
             String targetElementId = labelElement.getAttribute("for");
 
+
             return getElement(By.id(targetElementId));
         } catch (Exception e) {
-            LOGGER.debug("Unable to find element wiht label", e);
+            LOGGER.debug(e, () -> "Unable to find element with label");
         }
         return null;
     }
@@ -208,7 +210,7 @@ public class SaladCommands {
             }
             return tagElement;
         } catch (RuntimeException e) {
-            LOGGER.debug("unable to find following checkbox", e);
+            LOGGER.debug(e, () -> "unable to find following checkbox");
             return element.findElement(By.xpath("preceding-sibling::input[1]|preceding-sibling::select[1]|" +
                     "preceding-sibling::*[1]//input|preceding-sibling::*[1]//select"));
         }
@@ -223,23 +225,34 @@ public class SaladCommands {
         enter(element, value);
     }
 
-    public static void safeClick(String name) {
+    public static void safeClick(String name, int nthOccurrence) {
         try {
-            click(name);
+            click(name, nthOccurrence);
         } catch (RuntimeException e) {
             shortWaitForElementToBeClickable(name);
-            click(name);
+            click(name, nthOccurrence);
         }
     }
 
-    private static void click(String name) {
-        WebElement clickableElement = getElements(parseString(name)).stream()
+    private static void click(String name, int nthOccurrence) {
+        List<WebElement> elements = getElements(parseString(name)).stream()
                 .filter(WebElement::isDisplayed)
-                .sorted(Comparator.comparing((element)-> isClickable(element)? 0 : 1))
-                .findFirst()
-                .orElseThrow(() -> new CucumberException(format("Unable to find clickable %s", name)));
+                .collect(Collectors.toList());
 
-        clickableElement.click();
+        if (elements.isEmpty() || elements.size() < nthOccurrence-1) {
+            throw new CucumberException(format("Unable to find clickable %s", name));
+        }
+
+        if (nthOccurrence == 1) {
+            WebElement element = elements.stream()
+                    .sorted(Comparator.comparing((e) -> isClickable(e) ? 0 : 1))
+                    .findFirst()
+                    .orElseThrow(() -> new CucumberException(format("Unable to find clickable %s", name)));
+            element.click();
+        } else {
+            elements.get(nthOccurrence-1).click();
+        }
+
         runSaladScript(SALAD_JS);
     }
 
@@ -249,9 +262,14 @@ public class SaladCommands {
 
     private static String getSaladJs() {
         try {
-            return FileUtils.readFileToString(new File(SaladContext.class.getClassLoader().getResource("js/salad.js").getPath()));
-        } catch (RuntimeException| IOException e) {
-            LOGGER.error("unable to run the javascript file", e);
+            InputStream inputStream = SaladContext.class.getClassLoader()
+                    .getResourceAsStream("js/salad.js");
+            return new BufferedReader(
+                    new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+                    .lines()
+                    .collect(Collectors.joining("\n"));
+        } catch (RuntimeException e) {
+            LOGGER.error(e, () -> "unable to run the javascript file");
             return null;
         }
     }
@@ -264,7 +282,7 @@ public class SaladCommands {
         try {
             return (Boolean) getDriver().executeScript(quiesceScript);
         } catch (WebDriverException e) {
-            LOGGER.error("unable to run ", e);
+            LOGGER.error(e, () -> "unable to run ");
             return false;
         }
     }
@@ -328,31 +346,31 @@ public class SaladCommands {
         if (matchType == MatchType.ALL) {
             wait.searchingWait().until(invisibilityOfAllElements(getElements(parseText)));
         } else {
-            wait.searchingWait().until(webDriver -> getElements(parseText).stream().anyMatch(element -> !element.isDisplayed())); //NOSONAR
+            wait.searchingWait().until(webDriver -> getElements(parseText).stream().anyMatch(element -> !element.isDisplayed())); 
         }
     }
 
     private static void waitUntilEnabled(MatchType matchType, String parseText, Waits wait) {
         if (matchType == MatchType.ALL) {
-            wait.searchingWait().until(webDriver -> getElements(parseText).stream().allMatch(element -> element.isEnabled())); //NOSONAR
+            wait.searchingWait().until(webDriver -> getElements(parseText).stream().allMatch(element -> element.isEnabled())); 
         } else {
-            wait.searchingWait().until(webDriver -> getElements(parseText).stream().anyMatch(element -> element.isEnabled())); //NOSONAR
+            wait.searchingWait().until(webDriver -> getElements(parseText).stream().anyMatch(element -> element.isEnabled())); 
         }
     }
 
     private static void waitUntilDisabled(MatchType matchType, String parseText, Waits wait) {
         if (matchType == MatchType.ALL) {
-            wait.searchingWait().until(webDriver -> getElements(parseText).stream().allMatch(element -> element.isEnabled())); //NOSONAR
+            wait.searchingWait().until(webDriver -> getElements(parseText).stream().allMatch(element -> element.isEnabled())); 
         } else {
-            wait.searchingWait().until(webDriver -> getElements(parseText).stream().anyMatch(element -> element.isEnabled())); //NOSONAR
+            wait.searchingWait().until(webDriver -> getElements(parseText).stream().anyMatch(element -> element.isEnabled())); 
         }
     }
 
     private static void waitUntilVisible(MatchType matchType, String parseText, Waits wait) {
         if (matchType == MatchType.ANY) {
-            wait.searchingWait().until(webDriver -> getElements(parseText).stream().anyMatch(WebElement::isDisplayed)); //NOSONAR
+            wait.searchingWait().until(webDriver -> getElements(parseText).stream().anyMatch(WebElement::isDisplayed)); 
         } else {
-            wait.searchingWait().until(webDriver -> getElements(parseText).stream().allMatch(WebElement::isDisplayed)); //NOSONAR
+            wait.searchingWait().until(webDriver -> getElements(parseText).stream().allMatch(WebElement::isDisplayed)); 
         }
     }
 
@@ -406,7 +424,7 @@ public class SaladCommands {
         StringBuilder sb = new StringBuilder();
         sb.append("[print] ");
         sb.append(parseString(exp));
-        LOGGER.info(sb.toString());
+        LOGGER.info(() -> sb.toString());
     }
 
     public static String parseString(String exp) {
@@ -454,7 +472,7 @@ public class SaladCommands {
         return expValue;
     }
 
-    //NOSONAR. This method will Replace {ssn: ##numeric(8), name: ##string} with {ssn: ${random.numeric(8)}, name: ${random.string()}}
+    //This method will Replace {ssn: ##numeric(8), name: ##string} with {ssn: ${random.numeric(8)}, name: ${random.string()}}
     private static String replaceSaladRandomNotation(String exp) {
         return replacePattern(exp, "##(\\w+\\(\\d+\\))", "\\${random.$1}")
                 .replaceAll("##(\\w+)", "\\${random.$1()}");
@@ -468,7 +486,7 @@ public class SaladCommands {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine nashorn = manager.getEngineByName("nashorn");
 
-        Bindings bindings = nashorn.getBindings(100); //NOSONAR
+        Bindings bindings = nashorn.getBindings(100); 
         Map<String, Object> map = getContext().getAllVariable();
         map.forEach(bindings::put);
 
@@ -495,7 +513,7 @@ public class SaladCommands {
                 (new JSONParser(-1)).parse(str);
                 return true;
             } catch (ParseException e) {
-                LOGGER.debug("unable to parse json", e);
+                LOGGER.debug(e, () -> "unable to parse json");
                 return false;
             }
         }
@@ -570,7 +588,7 @@ public class SaladCommands {
         try {
             return !getElement(expression).isDisplayed();
         } catch(WebDriverException e) {
-            LOGGER.debug("Error while waiting for Element not to be displayed", e);
+            LOGGER.debug(e, () -> "Error while waiting for Element not to be displayed");
             return true;
         }
     }
@@ -610,7 +628,7 @@ public class SaladCommands {
             }
             return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            LOGGER.debug("unable to convert object to string", e);
+            LOGGER.debug(e, () -> "unable to convert object to string");
         }
         return "{}";
     }
@@ -636,7 +654,7 @@ public class SaladCommands {
             File sourceFile = screenshotTaker.getScreenshotAs(OutputType.FILE);
             FileUtils.copyFile(sourceFile, new File("target/" + methodName + ".png"));
         } catch (IOException e) {
-            LOGGER.error("Unable to take screen shot", e);
+            LOGGER.error(e, () -> "Unable to take screen shot");
         }
     }
 
@@ -654,7 +672,7 @@ public class SaladCommands {
             Map<String, String> map = mapper.readValue(content, Map.class);
             map.forEach(SaladCommands::enter);
         } catch (IOException e) {
-            LOGGER.debug(format("unable to parse json %s", data), e);
+            LOGGER.debug(e, () -> format("unable to parse json %s", data));
             throw new CucumberException(format("unable to parse json %s", data));
         }
     }
@@ -669,7 +687,7 @@ public class SaladCommands {
             try {
                 return FileUtils.readFileToString(new File(RestApi.class.getClassLoader().getResource(fileName).toURI()));
             } catch (URISyntaxException |IOException e) {
-                LOGGER.debug("unable to load resource", e);
+                LOGGER.debug(e, () -> "unable to load resource");
                 throw new CucumberException(format("unable to load resource %s", fileName));
             }
         } else if (body.startsWith("file:")) {
@@ -677,7 +695,7 @@ public class SaladCommands {
             try {
                 return FileUtils.readFileToString(new File(fileName));
             } catch (IOException e) {
-                LOGGER.debug("unable to load file", e);
+                LOGGER.debug(e, () -> "unable to load file");
                 throw new CucumberException(format("unable to load file %s", fileName));
             }
         }

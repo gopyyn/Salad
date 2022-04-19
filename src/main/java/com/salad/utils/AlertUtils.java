@@ -1,7 +1,7 @@
 package com.salad.utils;
 
 import com.salad.core.SaladCommands;
-import cucumber.runtime.CucumberException;
+import io.cucumber.core.exception.CucumberException;
 import io.cucumber.core.logging.Logger;
 import io.cucumber.core.logging.LoggerFactory;
 import org.openqa.selenium.Alert;
@@ -34,7 +34,7 @@ public class AlertUtils {
                     alert.accept();
             }
         } catch(NoAlertPresentException ex){
-            LOGGER.debug("No alert present"); //NOSONAR consume the exception
+            LOGGER.debug(() -> "No alert present"); //NOSONAR consume the exception
         }
     }
 
