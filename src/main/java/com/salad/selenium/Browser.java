@@ -1,7 +1,6 @@
 package com.salad.selenium;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import io.github.bonigarcia.wdm.managers.ChromiumDriverManager;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -17,14 +16,17 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerOptions;
 import org.openqa.selenium.opera.OperaDriver;
 import org.openqa.selenium.opera.OperaOptions;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.remote.*;
+import org.openqa.selenium.remote.Augmenter;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.LocalFileDetector;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.Locale;
 
 public enum Browser {
 
@@ -62,7 +64,18 @@ public enum Browser {
                 return browser;
             }
         }
-        throw new IllegalArgumentException("Can't find browser: " + browserName);
+        LOGGER.info("No valid browser defined. Trying to initialize default browser");
+        String osName = System.getProperty("os.name", "unknown").toLowerCase(Locale.ENGLISH);
+        if (osName.contains("windows")) {
+            return EDGE;
+        } else if (osName.contains("mac")) {
+            return SAFARI;
+        } else if (osName.contains("nix") || osName.contains("nux")
+                || osName.contains("aix")) {
+            return FIREFOX;
+        }
+
+        return HEADLESS;
     }
 
     /** @return the WebDriver for the browser */
@@ -119,7 +132,6 @@ public enum Browser {
                 case FIREFOX:
                     FirefoxProfile profile = new FirefoxProfile();
                     profile.setPreference("general.useragent.override", userAgent);
-                    capabilities.setCapability(FirefoxDriver.PROFILE, profile);
                     break;
                 case CHROME:
                     ChromeOptions options = new ChromeOptions();

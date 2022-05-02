@@ -1,5 +1,6 @@
 package com.salad.selenium;
 
+import com.salad.core.SaladCommands;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -66,15 +67,19 @@ public class Waits {
     }
     
     public void forPageLoad() {
-        new FluentWait<>(webDriver)
+        FluentWait<WebDriver> wait = new FluentWait<>(webDriver)
                 .withTimeout(Duration.ofMillis(convertToRelativeWaitInMS(QUIESCE_WAIT_SECONDS)))
-                .pollingEvery(Duration.ofMillis(getRelativeWait(FLUENT_POLLING_IN_MS)))
-                .until(driver -> applicationLoad());
+                .pollingEvery(Duration.ofMillis(getRelativeWait(FLUENT_POLLING_IN_MS)));
+
+        wait.until(driver -> isPageLoaded());
+        SaladCommands.runSaladScript();
     }
 
-    private Boolean applicationLoad() {
+    private Boolean isPageLoaded() {
         String quiesceScript =
-                "return document.readyState === 'complete' && !!window.jQuery && window.jQuery.active == 0 && window.jQuery('.blockUI').length === 0";
+                "return document.readyState === 'complete' " +
+                        "&& (!window.jQuery || window.jQuery.active == 0 && window.jQuery('.blockUI').length === 0)" +
+                        "&& (!XMLHttpRequest.active || XMLHttpRequest.active == 0)";
         return runQuiesceScript(quiesceScript);
     }
 

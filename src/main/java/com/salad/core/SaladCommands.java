@@ -18,6 +18,7 @@ import io.cucumber.java.Scenario;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -69,6 +70,7 @@ public class SaladCommands {
 
     public static void goTo(String path) {
         getDriver().get(parseString(path));
+        runSaladScript();
     }
 
     public static RemoteWebDriver getDriver() {
@@ -138,6 +140,7 @@ public class SaladCommands {
         } else {
             inputElement.sendKeys(parseString(value));
             inputElement.sendKeys(Keys.TAB);
+            new Actions(getDriver()).keyDown(Keys.SHIFT).sendKeys(Keys.TAB).keyUp(Keys.SHIFT).perform();
         }
     }
 
@@ -253,7 +256,7 @@ public class SaladCommands {
             elements.get(nthOccurrence-1).click();
         }
 
-        runSaladScript(SALAD_JS);
+        waitUntil(PAGELOAD);
     }
 
     private static boolean isClickable(WebElement element) {
@@ -274,13 +277,17 @@ public class SaladCommands {
         }
     }
 
-    private static Boolean runSaladScript(String quiesceScript) {
-        if (quiesceScript == null) {
+     public static Boolean runSaladScript() {
+        if (SALAD_JS == null) {
             return false;
         }
 
+         return runScript(SALAD_JS);
+     }
+
+    public static Boolean runScript(String js) {
         try {
-            return (Boolean) getDriver().executeScript(quiesceScript);
+            return (Boolean) getDriver().executeScript(js);
         } catch (WebDriverException e) {
             LOGGER.error(e, () -> "unable to run ");
             return false;
@@ -374,10 +381,14 @@ public class SaladCommands {
         }
     }
 
-    public static void waitUntil(VerifyType type) throws InterruptedException {
+    public static void waitUntil(VerifyType type) {
         Waits wait = Waits.using(getDriver());
         if (type == PAGELOAD) {
-            SYSTEM_SLEEPER.sleep(Duration.ofSeconds(ONE_SECOND));
+            try {
+                SYSTEM_SLEEPER.sleep(Duration.ofSeconds(ONE_SECOND));
+            } catch (InterruptedException e) {
+                LOGGER.error(e, ()->"sleep Interrupted");
+            }
             wait.forPageLoad();
         }
     }
@@ -437,6 +448,7 @@ public class SaladCommands {
     }
 
     public static Object parse(String exp) {
+        exp = removeEnclosingQuotes(exp);
         exp = replaceSaladRandomNotation(exp);
         if (exp.contains("${")) {
             String[] variables = substringsBetween(exp, "${", "}");
@@ -453,6 +465,13 @@ public class SaladCommands {
 
         if (exp.startsWith("eval ")) {
             return eval(substringAfter(exp, "eval "));
+        }
+        return exp;
+    }
+
+    private static String removeEnclosingQuotes(String exp) {
+        if (exp.startsWith("\"")) {
+            return StringUtils.removePattern(exp, "^\"|\"$");
         }
         return exp;
     }

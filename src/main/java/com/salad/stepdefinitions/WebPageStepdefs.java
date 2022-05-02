@@ -4,7 +4,6 @@ import com.salad.core.SaladCommands;
 import com.salad.enums.MatchType;
 import com.salad.enums.TimeUnit;
 import com.salad.enums.VerifyType;
-import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;

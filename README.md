@@ -110,28 +110,62 @@ Salad embrace the cucumber framework.
 * Cucumber feature file
 * Cucumber Java Test File (Add the glue to cucumber test __"glue = {"com.salad.stepdefinitions"}"__)
 
-#### Configuration
+#### Configuration [optional]
 The configuration should be written in YAML format under __"resources/config/\<environment>.yaml"__
 All the environment variables should be specified in the file. 
 >The environment should be supplied as the VM arguments.
 Example ```-Denvironment=qa```
 > If environment is not specified then it will default to qa
 
-The configuration is in YAML format and it has 3 major section
- * system -> specify all the system properties here. If not provided then default to headless Chrome browser
-   * selenium.browser values are INTERNETEXPLORER, FIREFOX, CHROME, EDGE, OPERA, SAFARI, HEADLESS (chrome with headless)
- * hibernate -> database connection details. Only needed if connection to Database
- * global -> all the properties that are used in the tests. These will be available as variables
+The configuration is in YAML format and it has 2 major section. system and database
+ * system -> specify all the system/global properties here.
+<table>
+<tr>
+  <th>salad.browser</th>
+  <td>
+     valid values are INTERNETEXPLORER, FIREFOX, CHROME, EDGE, OPERA, SAFARI, HEADLESS (chrome with headless).
+     <br>If not provided then default to EDGE in windows, SAFARI in mac and FIREFOX in linux
+  </td>
+</tr>
+<tr>
+  <th>selenium.remote</th>
+  <td>
+     if true connects to selenium server running in remote server.
+     <br>default false
+  </td>
+</tr>
+<tr>
+  <th>selenium.host</th>
+  <td>
+     remote selenium server host name
+  </td>
+</tr>
+<tr>
+  <th>selenium.port</th>
+  <td>
+     remote selenium server port
+  </td>
+</tr>
+</table>
+
+ * database -> database connection details. Accepts all java hibernate properties. 
+               Only needed if connection to Database
+
 ##### Example
 src/test/resources/config/qa.yaml
 ```
 system:
-  selenium.browser: chrome
+  salad.browser: chrome
   # selenium.remote: false
   # selenium.host: remote-hostname.com
   # selenium.port: 4444
-
-hibernate:
+  ### Below are user defined properties 
+  ### which can be accessed in feature files with ${<property name>}
+  userId: testUserId
+  password: somepassword@123
+  rest-host: https://jsonplaceholder.typicode.com
+  
+database:
   hibernate.connection.driver_class: org.h2.Driver
   hibernate.connection.url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1
   hibernate.connection.username: ""
@@ -140,15 +174,12 @@ hibernate:
   hibernate.default_schema: PUBLIC
   hibernate.show_sql: true
 
-global:
-  userId: testUserId
-  password: somepassword@123
-  rest-host: https://jsonplaceholder.typicode.com
 ```
 #### Cucumber feature file
 Cucumber feature are technically in 'Gherkin' format - but all you need to understand intuitively as someone who needs to test web are the three sections: Feature, Background and Scenario. There can be multiple Scenario-s in a *.feature file, and at least one should be present. The Background is optional.
 
-Lines that start with a # are comments.
+Lines that start with a `#` are comments.
+
 ```
 Feature: brief description of what is being tested
     more lines of description if needed.
@@ -156,7 +187,7 @@ Feature: brief description of what is being tested
 Background:
   # this section is optional !
   # steps here are executed before each Scenario in this file
-  # variables defined here will be 'global' to all scenarios
+  # variables defined here will be 'global' to all scenarios in this file
   # and will be re-initialized before every scenario
   
 Scenario: brief description of this scenario

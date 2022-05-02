@@ -24,22 +24,22 @@ public class SaladCommonStepdefs {
         }));
     }
 
-    @Given("def (.+) = \"(.+)\"")
+    @Given("^def (.+) = \"(.+)\"$")
     public void defineFeatureVar(String name, String value) {
         SaladCommands.def(name.replaceAll("['\"]", ""), value);
     }
 
-    @Given("set (.+) = \"(.+)\"")
+    @Given("^set (.+) = \"(.+)\"$")
     public void defineScenarioVar(String name, String value) {
         SaladCommands.set(name.replaceAll("['\"]", ""), value);
     }
 
-    @Given("print (.+)")
+    @Given("^print (.+)$")
     public void print(String value) {
         SaladCommands.print(value);
     }
 
-    @When("^match (\"(.+)\"|(.+)) ([a-zA-Z0-9_=!<>]+) (\"(.+)\"|(.+))")
+    @When("^match (.+) ([a-zA-Z0-9_=!<>]+) (.+)$")
     public void match(String expression, String operators, String rhs) {
         SaladCommands.match(expression, MatchType.fromValue(operators), rhs);
     }
@@ -50,7 +50,7 @@ public class SaladCommonStepdefs {
     }
 
     private void beforeFeature(Scenario scenario) {
-        if (scenario.getUri().equals(SaladCommands.getCurrentFeature())) {
+        if (scenario.getUri().getPath().equals(SaladCommands.getCurrentFeature())) {
             return;
         }
         SaladCommands.setCurrentFeature(scenario.getUri().getPath());

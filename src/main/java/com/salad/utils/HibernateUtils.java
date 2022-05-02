@@ -20,7 +20,7 @@ public class HibernateUtils {
     public static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
             try {
-                Map<String, String> hibernateConfig = configProperties.get("hibernate");
+                Map<String, String> hibernateConfig = (Map<String, String>) configProperties.get("database");
                 ofNullable(hibernateConfig)
                         .orElseThrow(() -> new RuntimeException("config yaml missing database configuration"));
 

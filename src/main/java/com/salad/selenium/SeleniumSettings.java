@@ -1,5 +1,7 @@
 package com.salad.selenium;
 
+import com.salad.core.SaladCommands;
+import com.salad.core.SaladContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,8 +11,7 @@ import java.net.URL;
 /**
  * Configurable through the following system configProperties:
  * 
- * selenium.base.url - The URL where each test should start
- * selenium.browser - Browser to use for the test selenium.remote - If true, direct tests to the
+ * salad.browser - Browser to use for the test selenium.remote - If true, direct tests to the
  * selenium.host - selenium grid Host name of the selenium grid hub
  * selenium.port - selenium grid Port the selenium grid hub is running on
  *
@@ -24,19 +25,19 @@ public abstract class SeleniumSettings {
 	}
 
 	public static String browserName() {
-		return System.getProperty("selenium.browser", "chrome");
+		return SaladContext.getContext().getVariable("salad.browser", "chrome");
 	}
 
 	public static Boolean isRemote() {
-		return Boolean.valueOf(System.getProperty("selenium.remote", "false"));
+		return Boolean.valueOf(SaladContext.getContext().getVariable("selenium.remote", "false"));
 	}
 
 	public static String gridHost() {
-		return System.getProperty("selenium.host", "localhost");
+		return SaladContext.getContext().getVariable("selenium.host", "localhost");
 	}
 
 	public static Integer gridPort() {
-		return Integer.valueOf(System.getProperty("selenium.port", "4444"));
+		return Integer.valueOf(SaladContext.getContext().getVariable("selenium.port", "4444"));
 	}
 
 	public static URL gridUrl() {

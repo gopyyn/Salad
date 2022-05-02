@@ -26,12 +26,11 @@ public class SaladContext {
     private Map<String, Object> scenarioVariables = new HashMap<>(INITIAL_MAP_CAPACITY);
     private static Map<String, Object> globalVariables = new HashMap<>(INITIAL_MAP_CAPACITY);
     private String currentFeature;
-    public static Map<String, Map<String, String>> configProperties = new HashMap<>();
+    public static Map<String, Object> configProperties = new HashMap<>();
 
     static {
         readProperties();
         loadSystemProperties();
-        loadGlobalProperties();
         loadDefaultJavaHelpers();
     }
 
@@ -59,31 +58,15 @@ public class SaladContext {
     }
 
     private static void loadSystemProperties() {
-        ofNullable(configProperties.get("system")).ifPresent(map -> {
-            map.entrySet().forEach((Map.Entry<String, String> entry) -> System.setProperty(entry.getKey(), entry.getValue()));
+        ofNullable(configProperties.get("system")).ifPresent((obj) -> {
+            if (obj instanceof Map) {
+                ((Map<String, String>) obj).entrySet().forEach((Map.Entry<String, String> entry) -> System.setProperty(entry.getKey(), entry.getValue()));
+            }
         });
         Properties properties = System.getProperties();
         properties.stringPropertyNames().forEach(name -> globalVariables.put(name, properties.getProperty(name)));
     }
 
-    public static void loadGlobalProperties() {
-        ofNullable(configProperties.get("global")).ifPresent(map -> {
-            map.entrySet().forEach((Map.Entry<String, String> entry) -> globalVariables.put(entry.getKey(), entry.getValue()));
-        });
-    }
-
-    private static void loadEnvironmentProperties2() {
-        String propertyFileName = getEnvironment().toLowerCase() + ".config";
-        ofNullable(retrieveFile(propertyFileName)).ifPresent(propertyFile -> {
-            try (InputStream fis = new FileInputStream(propertyFile)) {
-                Properties properties = new Properties();
-                properties.load(fis);
-                properties.stringPropertyNames().forEach(name -> globalVariables.put(name, properties.getProperty(name)));
-            } catch (RuntimeException| IOException e) {
-                LOGGER.error(e, () -> format("unable to load config from %s", propertyFileName));
-            }
-        });
-    }
 
     private static String getEnvironment() {
         return System.getProperty("environment", "qa");
@@ -139,6 +122,13 @@ public class SaladContext {
                 .orElseGet(() -> ofNullable(getContext().getFeatureVariables().get(name))
                 .orElseGet(() -> ofNullable(getContext().getGlobalVariables().get(name))
                 .orElseGet(()-> System.getProperty(name))));
+    }
+
+    public String getVariable(String name, String def) {
+        return  ofNullable(getContext().getScenarioVariables().get(name))
+                .orElseGet(() -> ofNullable(getContext().getFeatureVariables().get(name))
+                .orElseGet(() -> ofNullable(getContext().getGlobalVariables().get(name))
+                .orElseGet(()-> System.getProperty(name, def)))).toString();
     }
 
     public String getCurrentFeature() {
