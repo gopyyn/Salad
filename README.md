@@ -67,10 +67,10 @@ Salad will provide predefined step-definitions which can be used in the existing
 </table>
 
 ## Getting Started
-Salad requires [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) 8 (at least version 1.8.0_112 or greater) and then either [Maven](http://maven.apache.org), [Eclipse](#eclipse-quickstart) or [IntelliJ](https://github.com/intuit/Cucumber-Salad/wiki/IDE-Support#intellij-community-edition) to be installed.
+Salad requires [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (11 or greater) and [Maven](http://maven.apache.org), and then either [Eclipse](https://www.eclipse.org/downloads/packages/release/kepler/sr1/eclipse-ide-java-developers) or [IntelliJ](https://www.jetbrains.com/idea/download) to be installed.
 
 ## Maven
-you just need one `repository` and `<dependency>`:
+you just need one `repository` and `<dependency>` to get started
 
 ```xml
 <repositories>
@@ -108,7 +108,7 @@ Alternatively for [Gradle](https://gradle.org) you need one entries:
 Salad embrace the cucumber framework. 
 * Configuration yaml file [optional]
 * Cucumber feature file
-* Cucumber Java Test File (Add the glue to cucumber test __"glue = {"com.salad.stepdefinitions"}"__)
+* Cucumber Java Test File (Add the glue to cucumber test __"glue = {"com.gopyyn.salad.stepdefinitions"}"__)
 
 #### Configuration [optional]
 The configuration should be written in YAML format under __"resources/config/\<environment>.yaml"__
@@ -198,28 +198,28 @@ Scenario: a different scenario
 ```
 #### Cucumber Java Test File
 A java test file which can be run either as Junit or TestNG test. 
-Salad framework provide **CucumberSaladJunit** and **CucumberSaladTestng** which can be extended by the java test
+Salad framework provide **SaladJunit** and **SaladTestng** which can be extended by the java test
 All the reports of the test will be under _"target/cucumber-reports"_
 ##### Example
 ###### JUnit Test
 > @CucumberOptions is from package cucumber.api.CucumberOptions;
 ```java
 @CucumberOptions(features={"src/test/resources"})
-public class WebUITest extends CucumberSaladJunit {
+public class WebUITest extends SaladJunit {
 }
 ```
 ###### TestNG Test
 > @CucumberOptions is from package io.cucumber.testng.CucumberOptions;
 ```java
 @CucumberOptions(features={"src/test/resources"})
-public class WebUITest extends CucumberSaladTestng {
+public class WebUITest extends SaladTestng {
 }
 ```
 ##### To run scenarios in parallel
 > Note: do not use `def` command if running scenarios in parallel
 ```java
 @CucumberOptions(features = {"src/test/resources/match.feature"})
-public class WebUITest extends CucumberSaladTestng {
+public class WebUITest extends SaladTestng {
     @Override
     @DataProvider(parallel = true)
     public Object[][] scenarios() {
@@ -424,6 +424,14 @@ Scenario: get customer from a rest url
     Then match "${response.status}" == "200"
     * def "customerId" = "${response.body.id}"
 ```
+### `header`
+#### add a header to Request
+
+header \<name> \<body>
+```cucumber
+Scenario: add header for rest api 
+    Given header "Accept" "application/json"
+```
 
 ## Database Commands
 ## `query`
@@ -462,7 +470,7 @@ You can use print to log variables to the console in the middle of a script. you
 ```cucumber
 Scenario: print two variable
     Given def myVar = "hello"
-    Given set project = "Cucumber-Salad"
+    Given set project = "Salad"
     Then print "${myVar} welcome to ${project}"
 ```
 ## `match`

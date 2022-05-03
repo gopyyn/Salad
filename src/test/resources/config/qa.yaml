@@ -1,5 +1,5 @@
 system:
-#  salad.browser: CHROME
+  salad.browser: HEADLESS
   userId: testUserId
   password: somepassword@123
   rest-host: https://jsonplaceholder.typicode.com
