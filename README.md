@@ -58,7 +58,7 @@ Salad will provide predefined step-definitions which can be used in the existing
       <a href="#set">set</a> 
     | <a href="#def">def</a>
     | <a href="#print">print</a>
-    | <a href="#match">match</a>
+    | <a href="#match-or-assert">match or assert</a>
     | <a href="#random">random</a>
     | <a href="#call-java-methods">call java methods</a>
     | <a href="#inbuilt-java-utilities">inbuilt java utilities</a>
@@ -473,15 +473,18 @@ Scenario: print two variable
     Given set project = "Salad"
     Then print "${myVar} welcome to ${project}"
 ```
-## `match`
+## `match` or `assert`
 #### assert a value
 match "\<lhs>" \<operator> "\<rhs>"
+assert "\<lhs>" \<operator> "\<rhs>"
 <br>Valid operators are ==, !=, contains, !contains, <, <=, >, >=
 ```cucumber
 Scenario: assert car  vaiable
     When set "car" = "{color: "red", "model": "toyota"}"
     Then match "${car.color}" == "red"
-    match "${car.model}" !contains "gm"
+    And match "${car.model}" !contains "gm"
+    Then assert "${car.color}" != "red"
+    And assert "${car.model}" contains "gm"
 ```
 
 ## `random`
