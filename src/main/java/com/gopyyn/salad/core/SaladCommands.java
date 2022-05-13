@@ -3,6 +3,7 @@ package com.gopyyn.salad.core;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gopyyn.salad.enums.MatchType;
+import com.gopyyn.salad.enums.TimeUnit;
 import com.gopyyn.salad.enums.VerifyType;
 import com.gopyyn.salad.rest.RestApi;
 import com.gopyyn.salad.selenium.Driver;
@@ -10,7 +11,6 @@ import com.gopyyn.salad.selenium.Waits;
 import com.gopyyn.salad.utils.AlertUtils;
 import com.gopyyn.salad.utils.Selector;
 import com.jayway.jsonpath.JsonPath;
-import com.gopyyn.salad.enums.TimeUnit;
 import io.cucumber.core.exception.CucumberException;
 import io.cucumber.core.logging.Logger;
 import io.cucumber.core.logging.LoggerFactory;
@@ -26,7 +26,7 @@ import org.openqa.selenium.support.ui.Select;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 import java.io.*;
 import java.math.BigDecimal;
@@ -500,8 +500,8 @@ public class SaladCommands {
     }
 
     public static Object evalInNashorn(String exp) {
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine nashorn = manager.getEngineByName("nashorn");
+        ScriptEngineFactory sef = new org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory();
+        ScriptEngine nashorn = sef.getScriptEngine();
 
         Bindings bindings = nashorn.getBindings(100); 
         Map<String, Object> map = getContext().getAllVariable();
@@ -719,7 +719,7 @@ public class SaladCommands {
         return body;
     }
 
-    public static void alert(String action) {
+    public static void alert(AlertUtils.Actions action) {
         AlertUtils.alert(action);
     }
 

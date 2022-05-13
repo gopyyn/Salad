@@ -22,19 +22,19 @@ Salad will provide predefined step-definitions which can be used in the existing
 <tr>
   <th>Web-ui Commands</th>
   <td>
-      <a href="#goto">goto</a> 
+      <a href="#go to">go to</a> 
     | <a href="#enter">enter</a> 
     | <a href="#select">select</a>
     | <a href="#click">click</a>
     | <a href="#displays">displays</a>
     | <a href="#verify">verify</a>
     | <a href="#displays">displays</a>
-    | <a href="#onpage">onPage</a>
+    | <a href="#onpage">on page</a>
     | <a href="#wait">wait</a>
     | <a href="#wait until">wait until</a>
-    | <a href="#hoverandclick">hoverAndClick</a>
+    | <a href="#hover and click">hover and click</a>
     | <a href="#fill-page">fill page</a>
-    | <a href="#setValue">setValue</a>
+    | <a href="#set value">set value</a>
     | <a href="#skip-browser-restart">skip browser restart</a>
   </td>
 </tr>
@@ -229,11 +229,11 @@ public class WebUITest extends SaladTestng {
 ```
 
 ## Web-ui Commands
-## `goto`
+## `go to`
 #### open browser and go to a web page
 ```cucumber
 Scenario: go to login page
-    goto "${hostname}/Web/Login"
+    go to "${hostname}/Web/Login"
 ```
 ## `enter`
 #### enter a value inside the html input field
@@ -302,11 +302,11 @@ Scenario: assert a vin is displayed in the ui
     And verify ".save-btn" is DISABLED
     And verify ".edit-btn" ENABLED
 ```
-## `onPage`
+## `on page`
 #### assert the current url of the browser
 ```cucumber
 Scenario: assert landed on customer page
-    Given onPage "${hostname}/customer/${customerId}"
+    Then on page "${hostname}/customer/${customerId}"
 ```
 ## `wait`
 #### wait for given amount of time
@@ -328,16 +328,16 @@ Scenario: wait for 1 second
     And wait until ".save-btn" is not visible
     And wait until ".edit-btn" VISIBLE
 ```
-## `hoverAndClick`
+## `hover and click`
 #### hover a text and click from the drop down
-hoverAndClick "hover text" "click text"
+hover and click "hover text" "click text"
 ```cucumber
 Scenario: Go to Desktop page
-    And hoverAndClick "Deals" "Desktop"
+    And hover and click "Menu" "profile"
 ```
 ## `alert`
 #### alert action
-alert "<accept|dismiss>"
+alert "<accept|dismiss|send_text>"
 ```cucumber
 Scenario: Go to Desktop page
     And alert accept
@@ -366,12 +366,12 @@ Scenario: fill page from json file
     Given fill page "resources:json/web_fill_page.json"
 ```
 
-## `setValue`
+## `set value`
 #### Set a named variable with the value from ui-element
-setValue variableName = "\<element selector>"
+set value variableName = "\<element selector>"
 ```cucumber
 Scenario: assigning a value from ui element
-    Given setValue contractNumberText = "#pageheaderContainer"
+    Given set value contractNumberText = "#pageheaderContainer"
     Then print ${contractNumberText}
 ```
 

@@ -1,8 +1,8 @@
 package com.gopyyn.salad.core;
 
 
-import io.cucumber.testng.CucumberOptions;
+import io.cucumber.junit.CucumberOptions;
 
 @CucumberOptions(features = {"src/test/resources/ui.feature"}, tags = "@compile")
-public class SaladUIFeatureTest extends SaladTestng {
+public class SaladUIFeatureTest extends SaladJunit {
 }

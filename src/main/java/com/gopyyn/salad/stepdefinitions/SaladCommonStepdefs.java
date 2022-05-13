@@ -37,7 +37,15 @@ public class SaladCommonStepdefs {
         SaladCommands.print(value);
     }
 
-    @When("^match (.+) ([a-zA-Z0-9_=!<>]+) (.+)$")
+//    @When("^(?:match|assert) (.+) ([a-zA-Z0-9_=!<>]+) (.+)$")
+    @When("^(?:match|assert) (.+) (EQUALS|CONTAINS|equals|contains) (.+)$")
+    @When("^(?:match|assert) (.+) (NOT_EQUALS) (.+)$")
+    @When("^(?:match|assert) (.+) (NOT_CONTAINS) (.+)$")
+    @When("^(?:match|assert) (.+) (GREATER_THAN) (.+)$")
+    @When("^(?:match|assert) (.+) (LESS_THAN) (.+)$")
+    @When("^(?:match|assert) (.+) (GREATER_THAN_OR_EQUAL_TO) (.+)$")
+    @When("^(?:match|assert) (.+) (LESS_THAN_OR_EQUAL_TO) (.+)$")
+    @When("^(?:match|assert) (.+) (==|!=|!contains|>|<|>=|<=) (.+)$")
     public void match(String expression, String operators, String rhs) {
         SaladCommands.match(expression, MatchType.fromValue(operators), rhs);
     }

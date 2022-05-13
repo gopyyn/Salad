@@ -15,8 +15,7 @@ import static java.lang.String.format;
 public class AlertUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(AlertUtils.class);
 
-    public static void alert(String actionText) {
-        Actions action = Actions.fromValue(actionText);
+    public static void alert(Actions action) {
         try {
             RemoteWebDriver driver = SaladCommands.getDriver();
 

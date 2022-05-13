@@ -6,18 +6,24 @@ Feature: code commands usage
     * set foo = "bar"
     * def "global" = "world"
     Then match "${foo} ${global}" == "bar world"
+    And assert "${foo} ${global}" == "bar world"
 
-  Scenario: match not equals usage
-    * match "asdf" != "1234"
-
-  Scenario: match contains usage
-    * match "asdf" contains "df"
-
-  Scenario: match contains usage
-    * match "asdf" !contains "gh"
+  Scenario: match equals usage with global variable
     * set test = "hello"
 #   the ${global} variable comes from previous step
     * match "${test} ${global}" == "hello world"
+
+  Scenario: match not equals usage
+    * match "asdf" != "1234"
+    * assert "asdf" != "1234"
+
+  Scenario: match contains usage
+    * match "asdf" contains "df"
+    * assert "qwerty" contains "wer"
+
+  Scenario: match not contains usage
+    * match "asdf" !contains "gh"
+    * assert "asdf" !contains "gh"
 
   Scenario: match json string
     * set car = "{color: "red", "model": "toyota", "accessories" : {"navigation":"true", "heatedSeat":"false"}}"
