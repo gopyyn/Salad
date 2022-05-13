@@ -476,6 +476,7 @@ Scenario: print two variable
 ## `match` or `assert`
 #### assert a value
 match "\<lhs>" \<operator> "\<rhs>"
+<br>or<br>
 assert "\<lhs>" \<operator> "\<rhs>"
 <br>Valid operators are ==, !=, contains, !contains, <, <=, >, >=
 ```cucumber
