@@ -22,19 +22,19 @@ Salad will provide predefined step-definitions which can be used in the existing
 <tr>
   <th>Web-ui Commands</th>
   <td>
-      <a href="#go to">go to</a> 
+      <a href="#go-to">go to</a> 
     | <a href="#enter">enter</a> 
     | <a href="#select">select</a>
     | <a href="#click">click</a>
     | <a href="#displays">displays</a>
     | <a href="#verify">verify</a>
     | <a href="#displays">displays</a>
-    | <a href="#onpage">on page</a>
+    | <a href="#on-page">on page</a>
     | <a href="#wait">wait</a>
-    | <a href="#wait until">wait until</a>
-    | <a href="#hover and click">hover and click</a>
+    | <a href="#wait-until">wait until</a>
+    | <a href="#hover-and-click">hover and click</a>
     | <a href="#fill-page">fill page</a>
-    | <a href="#set value">set value</a>
+    | <a href="#set-value">set value</a>
     | <a href="#skip-browser-restart">skip browser restart</a>
   </td>
 </tr>
