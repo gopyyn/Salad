@@ -85,7 +85,7 @@ you just need one `repository` and `<dependency>` to get started
    ...
    <dependency>
       <groupId>com.github.gopyyn</groupId>
-      <artifactId>Salad</artifactId>
+      <artifactId>salad</artifactId>
       <version>1.0.4</version>
     </dependency>
 </dependencies>
