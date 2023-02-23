@@ -74,7 +74,6 @@ you just need one `repository` and `<dependency>` to get started
 
 ```xml
 <repositories>
-   ...
    <repository>
       <id>jitpack.io</id>
       <url>https://jitpack.io</url>
@@ -82,11 +81,10 @@ you just need one `repository` and `<dependency>` to get started
 </repositories>
 
 <dependencies>
-   ...
    <dependency>
       <groupId>com.github.gopyyn</groupId>
-      <artifactId>salad</artifactId>
-      <version>1.0.4</version>
+      <artifactId>Salad</artifactId>
+      <version>1.0.5</version>
     </dependency>
 </dependencies>
 ```
@@ -101,14 +99,14 @@ Alternatively for [Gradle](https://gradle.org) you need one entries:
         url "https://jitpack.io"
       }
    }
-   testCompile 'com.github.gopyyn:salad:1.0.4'
+   testCompile 'com.github.gopyyn:salad:1.0.5'
 ```
 
 ## Quickstart
 Salad embrace the cucumber framework. 
 * Configuration yaml file [optional]
 * Cucumber feature file
-* Cucumber Java Test File (Add the glue to cucumber test __"glue = {"com.gopyyn.salad.stepdefinitions"}"__)
+* Cucumber Java Test File [optional]
 
 #### Configuration [optional]
 The configuration should be written in YAML format under __"resources/config/\<environment>.yaml"__
@@ -196,6 +194,7 @@ Scenario: brief description of this scenario
 Scenario: a different scenario
   # steps for this other scenari
 ```
+
 #### Cucumber Java Test File
 A java test file which can be run either as Junit or TestNG test. 
 Salad framework provide **SaladJunit** and **SaladTestng** which can be extended by the java test
