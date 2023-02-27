@@ -6,7 +6,9 @@ It is developed using Cucumber and Selenium for Java.
 The BDD syntax popularized by Cucumber is language-neutral, and easy for even non-programmers.
 The backend for the UI testing is written in Selenium for Java.
 
-Salad will provide predefined step-definitions which can be used in the existing cucumber feature files 
+Salad will provide predefined step-definitions, "Web-ui Commands", "Rest Api Commands" and "Database Commands", which can be used in the existing cucumber feature files.
+
+Salad can also detect the OS and brings up the default browser for that OS or just specify which browser in configuration and salad can take care of loading that browser driver. So no need to download browser driver and specify the driver path like you do in selenium.
 
 # Index
 
@@ -39,7 +41,7 @@ Salad will provide predefined step-definitions which can be used in the existing
   </td>
 </tr>
 <tr>
-  <th>Rest api Commands</th>
+  <th>Rest Api Commands</th>
   <td>
       <a href="#post">post</a> 
       | <a href="#put">put</a> 
@@ -99,7 +101,7 @@ Alternatively for [Gradle](https://gradle.org) you need one entries:
         url "https://jitpack.io"
       }
    }
-   testCompile 'com.github.gopyyn:salad:1.0.5'
+   testCompile 'com.github.gopyyn:Salad:1.0.5'
 ```
 
 ## Quickstart
@@ -131,9 +133,11 @@ Scenario: a different scenario
 ```
 
 #### Configuration [optional]
+Salad feature files can be ran as is. But if you need to define variables then it can be configured with environment file
+
 The configuration should be written in YAML format under __"resources/config/\<environment>.yaml"__
 All the environment variables should be specified in the file. 
->The environment should be supplied as the VM arguments.
+>The environment can also be supplied as the VM arguments.
 Example ```-Denvironment=qa```
 > If environment is not specified then it will default to qa
 
