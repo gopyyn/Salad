@@ -103,10 +103,32 @@ Alternatively for [Gradle](https://gradle.org) you need one entries:
 ```
 
 ## Quickstart
-Salad embrace the cucumber framework. 
-* Configuration yaml file [optional]
+Salad embrace the cucumber framework.
 * Cucumber feature file
+* Configuration yaml file [optional]
 * Cucumber Java Test File [optional]
+
+#### Cucumber feature file
+Cucumber feature are technically in 'Gherkin' format - but all you need to understand intuitively as someone who needs to test web are the three sections: Feature, Background and Scenario. There can be multiple Scenario-s in a *.feature file, and at least one should be present. The Background is optional.
+
+Lines that start with a `#` are comments.
+
+```
+Feature: brief description of what is being tested
+    more lines of description if needed.
+
+Background:
+  # this section is optional !
+  # steps here are executed before each Scenario in this file
+  # variables defined here will be 'global' to all scenarios in this file
+  # and will be re-initialized before every scenario
+  
+Scenario: brief description of this scenario
+  # steps for this scenario
+
+Scenario: a different scenario
+  # steps for this other scenari
+```
 
 #### Configuration [optional]
 The configuration should be written in YAML format under __"resources/config/\<environment>.yaml"__
@@ -152,6 +174,7 @@ The configuration is in YAML format and it has 2 major section. system and datab
 ##### Example
 src/test/resources/config/qa.yaml
 ```
+## Optional system properties
 system:
   salad.browser: chrome
   # selenium.remote: false
@@ -163,6 +186,7 @@ system:
   password: somepassword@123
   rest-host: https://jsonplaceholder.typicode.com
   
+## Optioanl database connection details. Accepts all java hibernate properties.   
 database:
   hibernate.connection.driver_class: org.h2.Driver
   hibernate.connection.url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1
@@ -173,30 +197,9 @@ database:
   hibernate.show_sql: true
 
 ```
-#### Cucumber feature file
-Cucumber feature are technically in 'Gherkin' format - but all you need to understand intuitively as someone who needs to test web are the three sections: Feature, Background and Scenario. There can be multiple Scenario-s in a *.feature file, and at least one should be present. The Background is optional.
 
-Lines that start with a `#` are comments.
-
-```
-Feature: brief description of what is being tested
-    more lines of description if needed.
-
-Background:
-  # this section is optional !
-  # steps here are executed before each Scenario in this file
-  # variables defined here will be 'global' to all scenarios in this file
-  # and will be re-initialized before every scenario
-  
-Scenario: brief description of this scenario
-  # steps for this scenario
-
-Scenario: a different scenario
-  # steps for this other scenari
-```
-
-#### Cucumber Java Test File
-A java test file which can be run either as Junit or TestNG test. 
+#### Cucumber Java Test File [Optional]
+Salad provided an option of running feature file either as Junit or TestNG test.
 Salad framework provide **SaladJunit** and **SaladTestng** which can be extended by the java test
 All the reports of the test will be under _"target/cucumber-reports"_
 ##### Example
