@@ -52,6 +52,7 @@ public class SaladCommonStepdefs {
 
     @Before
     public void beforeScenario(Scenario scenario) {
+        System.out.println(scenario);
         beforeFeature(scenario);
     }
 

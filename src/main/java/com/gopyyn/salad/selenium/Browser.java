@@ -107,7 +107,9 @@ public enum Browser {
                 return new OperaDriver((OperaOptions) capabilities);
             case CHROME:
                 WebDriverManager.chromedriver().setup();
-                return new ChromeDriver((ChromeOptions) capabilities);
+                ChromeOptions options = (ChromeOptions) capabilities;
+                options.addArguments("--remote-allow-origins=*");
+                return new ChromeDriver(options);
             case HEADLESS:
             default:
                 WebDriverManager.chromedriver().setup();

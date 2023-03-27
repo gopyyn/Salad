@@ -69,10 +69,10 @@ Salad can also detect the OS and brings up the default browser for that OS or ju
 </table>
 
 ## Getting Started
-Salad requires [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (11 or greater) and [Maven](http://maven.apache.org), and then either [Eclipse](https://www.eclipse.org/downloads/packages/release/kepler/sr1/eclipse-ide-java-developers) or [IntelliJ](https://www.jetbrains.com/idea/download) to be installed.
+Salad requires [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (11 or greater) then either [Eclipse](https://www.eclipse.org/downloads/packages/release/kepler/sr1/eclipse-ide-java-developers) or [IntelliJ](https://www.jetbrains.com/idea/download) to be installed.
 
-## Maven
-you just need one `repository` and `<dependency>` to get started
+## Brazil
+you just need `<dependency>` to get started
 
 ```xml
 <repositories>
@@ -538,9 +538,5 @@ date, string, and random are the inbuilt utilities<br>
       * print ${random.alphanumeric()}
       * print ${random.alphanumeric(10)}
       * set contractNumberText = "${salad.getElement("//*[@id='pageheaderContainer']/div[1]").getText()}"
-```
-## Run test
-```
-mvn test -Denvironment=qa
 ```
 
