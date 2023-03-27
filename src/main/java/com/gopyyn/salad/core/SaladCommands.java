@@ -373,8 +373,12 @@ public class SaladCommands {
         }
     }
 
-    public static void wait(long waitTime, TimeUnit unit) throws InterruptedException {
-        SYSTEM_SLEEPER.sleep(getDuration(waitTime, unit));
+    public static void wait(long waitTime, TimeUnit unit) {
+        try {
+            SYSTEM_SLEEPER.sleep(getDuration(waitTime, unit));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void waitUntil(String text, VerifyType type) {

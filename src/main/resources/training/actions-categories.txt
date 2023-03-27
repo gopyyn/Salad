@@ -1,6 +1,6 @@
 visit open visit url goes to go to navigate website
-enter input type enter as
-enter2  in on input type enter
+enter input input as type type as enter enter as
+enter2 input input in type type in enter enter in input in
 click click
 wait wait pause second millisecond minute hour
 waitUntil wait until till hold pause till
@@ -8,4 +8,3 @@ verify verify assert match check
 set set var scenario variable
 def def let feature variable
 print print log output
-conversation-complete Thanks done that's all thats it. thats it I am done Thank you for information Thank. thanks. thank you. thanks nothing else thats i
