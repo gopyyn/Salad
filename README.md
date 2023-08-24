@@ -86,7 +86,7 @@ you just need one `repository` and `<dependency>` to get started
    <dependency>
       <groupId>com.github.gopyyn</groupId>
       <artifactId>Salad</artifactId>
-      <version>1.0.5</version>
+      <version>1.0.6</version>
     </dependency>
 </dependencies>
 ```
@@ -101,7 +101,7 @@ Alternatively for [Gradle](https://gradle.org) you need one entries:
         url "https://jitpack.io"
       }
    }
-   testCompile 'com.github.gopyyn:Salad:1.0.5'
+   testCompile 'com.github.gopyyn:Salad:1.0.6'
 ```
 
 ## Quickstart

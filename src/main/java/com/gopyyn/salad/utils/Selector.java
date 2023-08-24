@@ -35,10 +35,11 @@ public class Selector {
             this.by = By.linkText(substringAfter(expression, LINK_SELECTOR));
         } else if (isCss(expression)){
             this.type = CSS;
-            this.by = By.cssSelector(substringAfter(expression, CSS_SELECTOR));
+            String exp = expression.contains(CSS_SELECTOR)?substringAfter(expression, CSS_SELECTOR):expression;
+            this.by = By.cssSelector(exp);
         } else {
             this.type = TEXT;
-            this.by = By.xpath(format("//*[normalize-space(translate(.,'\u00A0',' '))='%1$s'] | //input[@value = '%1$s']", expression));
+            this.by = By.xpath(format("//*[normalize-space(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ\u00A0','abcdefghijklmnopqrstuvwxyz'))='%1$s'] | //input[translate(@value,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = '%1$s']", expression.trim().toLowerCase()));
         }
     }
 
