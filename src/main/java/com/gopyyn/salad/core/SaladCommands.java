@@ -19,7 +19,14 @@ import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.Select;
@@ -28,7 +35,11 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -42,9 +53,16 @@ import static com.gopyyn.salad.core.SaladContext.getContext;
 import static com.gopyyn.salad.enums.SelectorType.TEXT;
 import static com.gopyyn.salad.enums.TimeUnit.getDuration;
 import static java.lang.String.format;
+import static java.lang.String.join;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.replaceOnce;
+import static org.apache.commons.lang3.StringUtils.replacePattern;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static org.apache.commons.lang3.StringUtils.substringsBetween;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 import static org.openqa.selenium.support.ui.ExpectedConditions.invisibilityOfAllElements;
@@ -58,6 +76,7 @@ public class SaladCommands {
     private static final int MIN_WAIT_SECONDS = 5;
     private static final List CLICKABLE_ELEMENTS = asList("button", "input", "select", "a", "textarea", "fieldset");
     private static final String SALAD_JS;
+    public static final List<String> INPUT_TAGS = asList("input", "select");
 
     static {
         SALAD_JS = getSaladJs();
@@ -86,6 +105,10 @@ public class SaladCommands {
 
     public static String getElementValue(String name) {
         WebElement element = getElement(name);
+        return getElementValue(element);
+    }
+
+    private static String getElementValue(WebElement element) {
         if ("input".equalsIgnoreCase(element.getTagName())) {
             return element.getAttribute("value");
         }
@@ -112,7 +135,11 @@ public class SaladCommands {
     }
 
     private static WebElement getElement(By bySelector) {
-        return getDriver().findElement(bySelector);
+        try {
+            return getDriver().findElement(bySelector);
+        } catch (Exception e) {
+            throw new CucumberException("unable to locate " + bySelector.toString());
+        }
     }
 
     private static List<WebElement> getElements(String name) {
@@ -146,7 +173,12 @@ public class SaladCommands {
     private static void shortWaitForElementToBeClickable(String locator) {
         Waits waits = Waits.using(getDriver());
         waits.forPageLoad();
-        waits.searchingWait(MIN_WAIT_SECONDS).until(elementToBeClickable(new Selector(locator).getBy()));
+        try {
+            waits.searchingWait(MIN_WAIT_SECONDS).until(elementToBeClickable(new Selector(locator).getBy()));
+        } catch (Exception e) {
+            LOGGER.debug(e, () -> "unable to locate " + locator);
+            throw new CucumberException("unable to locate " + locator);
+        }
     }
 
     private static void shortWaitForElementToBeClickable(WebElement element) {
@@ -163,13 +195,13 @@ public class SaladCommands {
     private static WebElement getInputElement(String selectorText) {
         Selector selector = getSelector(selectorText);
         if (selector.getType() == TEXT) {
-            return getElementWithDisplayName(selectorText);
+            return getInputElementWithDisplayName(selectorText);
         }
 
         return getElement(selector);
     }
 
-    private static WebElement getElementWithDisplayName(String selectorText) {
+    private static WebElement getInputElementWithDisplayName(String selectorText) {
         WebElement elementWithLabel = getElementWithLabel(selectorText);
         if (elementWithLabel != null) {
             return elementWithLabel;
@@ -181,6 +213,9 @@ public class SaladCommands {
         }
 
         try {
+            if (INPUT_TAGS.contains(element.getTagName().toLowerCase())) {
+                return element;
+            }
             return getChild(element);
         } catch (RuntimeException e) {
             LOGGER.debug(e, () -> "input element not available as child. Searching under sibling");
@@ -216,6 +251,24 @@ public class SaladCommands {
                     "preceding-sibling::*[1]//input|preceding-sibling::*[1]//select"));
         }
     }
+    private static WebElement getParentDiv(WebElement element) {
+        return getParent(element, "div");
+    }
+
+    private static WebElement getParent(WebElement element, String tagName) {
+        try {
+            String currentText = getElementValue(element);
+            WebElement parentElement = element;
+            //if parent text is same as child text then loop till you find parent with extra text
+            do  {
+                parentElement = parentElement.findElement(By.xpath("parent::" + tagName));
+            } while(getElementValue(parentElement).equals(currentText));
+            return parentElement;
+        } catch (RuntimeException e) {
+            LOGGER.debug(e, () -> "unable to find following checkbox");
+            return element;
+        }
+    }
 
     private static WebElement getChild(WebElement element) {
         return element.findElement(By.xpath(".//input|.//select"));
@@ -226,35 +279,63 @@ public class SaladCommands {
         enter(element, value);
     }
 
-    public static void safeClick(String name, int nthOccurrence) {
-        try {
-            click(name, nthOccurrence);
-        } catch (RuntimeException e) {
-            shortWaitForElementToBeClickable(name);
-            click(name, nthOccurrence);
-        }
+    public static void click(String name) {
+        click(name, 1);
     }
 
-    private static void click(String name, int nthOccurrence) {
+    public static void click(String name, int nthOccurrence) {
+        try {
+            clickBasic(name, nthOccurrence);
+        } catch (RuntimeException e) {
+            shortWaitForElementToBeClickable(name);
+            clickBasic(name, nthOccurrence);
+        }
+        waitUntil(VerifyType.PAGELOAD);
+    }
+
+    private static void clickBasic(String name, int nthOccurrence) {
+        waitUntil(VerifyType.PAGELOAD);
+        WebElement clickElement = getClickElement(name, nthOccurrence);
+        scroll(clickElement);
+        clickElement.click();
+    }
+
+    private static WebElement getClickElement(String name, int nthOccurrence) {
         List<WebElement> elements = getElements(parseString(name)).stream()
                 .filter(WebElement::isDisplayed)
                 .collect(Collectors.toList());
 
-        if (elements.isEmpty() || elements.size() < nthOccurrence-1) {
+        if (elements.isEmpty() || elements.size() < nthOccurrence -1) {
             throw new CucumberException(format("Unable to find clickable %s", name));
         }
 
         if (nthOccurrence == 1) {
             WebElement element = elements.stream()
-                    .sorted(Comparator.comparing((e) -> isClickable(e) ? 0 : 1))
+//                    .sorted(Comparator.comparing((e) -> isClickable(e) ? 0 : 1))
+                    .filter((e) -> isClickable(e))
                     .findFirst()
-                    .orElseThrow(() -> new CucumberException(format("Unable to find clickable %s", name)));
-            element.click();
-        } else {
-            elements.get(nthOccurrence-1).click();
-        }
+                    .orElse(null);
 
-        waitUntil(VerifyType.PAGELOAD);
+            if (element != null) {
+                return element;
+            }
+
+            WebElement clickableChild = getClickableChild(elements);
+            if (clickableChild != null) {
+                return clickableChild;
+            }
+        }
+        return elements.get(nthOccurrence -1);
+    }
+
+    private static WebElement getClickableChild(List<WebElement> elements) {
+        try {
+            return elements.get(0)
+                            .findElement(By.xpath(".//" + join("|.//", CLICKABLE_ELEMENTS)));
+        } catch (Exception e) {
+            LOGGER.error(e, () -> "no clickable child element");
+        }
+        return null;
     }
 
     private static boolean isClickable(WebElement element) {
@@ -292,8 +373,12 @@ public class SaladCommands {
         }
     }
 
-    public static void wait(long waitTime, TimeUnit unit) throws InterruptedException {
-        SYSTEM_SLEEPER.sleep(getDuration(waitTime, unit));
+    public static void wait(long waitTime, TimeUnit unit) {
+        try {
+            SYSTEM_SLEEPER.sleep(getDuration(waitTime, unit));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void waitUntil(String text, VerifyType type) {
@@ -429,6 +514,11 @@ public class SaladCommands {
         return element;
     }
 
+
+    public static void scroll(WebElement element) {
+        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
+    }
+
     public static void print(String exp) {
         StringBuilder sb = new StringBuilder();
         sb.append("[print] ");
@@ -541,6 +631,22 @@ public class SaladCommands {
         return text != null && text.startsWith("<");
     }
 
+    public static void verify(String expression, String operators, String rhs) {
+        String lhs = getExpressionText(expression);
+
+        match(lhs, MatchType.fromValue(operators), rhs);
+    }
+
+    private static String getExpressionText(String expression) {
+        Selector selector = getSelector(expression);
+        //if TEXT selector then get the sibling value. for example <div><span>Total </span><span>$100</span><div> then Total's value is $100
+        if (TEXT == selector.getType()) {
+            WebElement element = getElement(selector);
+            return getParentDiv(element).getText().replace(expression, "").trim();
+        }
+        return getElementValue(expression);
+    }
+
     public static void match(String lhs, MatchType operation, String rhs) {
         lhs = parseString(lhs);
         rhs = parseString(rhs);
@@ -604,7 +710,7 @@ public class SaladCommands {
     public static Boolean isHidden(String expression) {
         try {
             return !getElement(expression).isDisplayed();
-        } catch(WebDriverException e) {
+        } catch(WebDriverException|CucumberException e) {
             LOGGER.debug(e, () -> "Error while waiting for Element not to be displayed");
             return true;
         }

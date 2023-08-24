@@ -5,6 +5,8 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+
 public class Driver {
     private static final ThreadLocal<Driver> threadInstance = ThreadLocal.withInitial(Driver::new);
     private static final Logger LOGGER = LoggerFactory.getLogger(Driver.class);

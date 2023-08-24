@@ -65,10 +65,10 @@ public class SaladContext {
 
 
     private static String getEnvironment() {
-        return System.getProperty("environment", "qa");
+        return System.getProperty("environment", "env");
     }
 
-    private static File retrieveFile(String fileName) {
+    public static File retrieveFile(String fileName) {
         String extension = StringUtils.substringAfterLast(fileName, ".");
         Collection<File> files = FileUtils.listFiles(new File("."), new String[]{extension}, true);
         return files.stream()

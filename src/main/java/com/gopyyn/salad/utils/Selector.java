@@ -7,7 +7,10 @@ import java.util.regex.Pattern;
 
 import static com.gopyyn.salad.enums.SelectorType.*;
 import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.toRootLowerCase;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 public class Selector {
     private static final Pattern CSS_PATTERN = Pattern.compile("((((abbr|acronym|address|applet|area|article|aside|audio|base|basefont|bdi|bdo|big|blockquote|body|br|button|canvas|center|cite|code|col|cogroup|datalist|data|dd|del|details|dfn|dialog|dir|div|dl|dt|embed|em|fieldset|figcaption|figure|font|footer|form|frameset|frame|header|head|html|iframe|img|input|ins|kbd|label|legend|link|li|main|map|mark|meta|meter|nav|noframes|noscript|object|ol|optgroup|option|output|parm|picture|pre|progress|rp|rt|ruby|samp|script|section|select|small|source|span|strike|strong|style|sub|summary|sup|svg|table|tbody|td|template|txtarea|tfoot|thead|th|time|title|track|tr|tt|ul|var|video|wbr|a|b|i|p|r|s|q|u)\\b)|[\\.#@\\+:\\-][\"']?\\w+[\"']?)(\\[[a-zA-Z0-9_\\-]+([|^$*]?=[\"'][a-zA-Z0-9_ \\.\\-]+[\"'])?\\])?|[ <>&])+");
@@ -35,11 +38,15 @@ public class Selector {
             this.by = By.linkText(substringAfter(expression, LINK_SELECTOR));
         } else if (isCss(expression)){
             this.type = CSS;
-            String exp = expression.contains(CSS_SELECTOR)?substringAfter(expression, CSS_SELECTOR):expression;
-            this.by = By.cssSelector(exp);
+            this.by = contains(expression, CSS_SELECTOR)? By.cssSelector(substringAfter(expression, CSS_SELECTOR)): By.cssSelector(expression);
         } else {
             this.type = TEXT;
-            this.by = By.xpath(format("//*[normalize-space(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ\u00A0','abcdefghijklmnopqrstuvwxyz'))='%1$s'] | //input[translate(@value,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = '%1$s']", expression.trim().toLowerCase()));
+            String stringSelector = "//*[normalize-space(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ\u00A0','abcdefghijklmnopqrstuvwxyz'))=\"%1$s\"]" +
+                    " | //input[translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = \"%1$s\"]" +
+                    " | //*[translate(@id,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = \"%1$s\"]" +
+                    " | //*[translate(@type,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = \"%1$s\"]" +
+                    " | //input[translate(@value,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = \"%1$s\"]";
+            this.by = By.xpath(format(stringSelector, toRootLowerCase(trim(expression))));
         }
     }
 
