@@ -78,7 +78,7 @@ public class Waits {
     private Boolean isPageLoaded() {
         String quiesceScript =
                 "return document.readyState === 'complete' " +
-                        "&& (!window.jQuery || window.jQuery.active == 0 && window.jQuery('.blockUI').length === 0)" +
+                        "&& (!window.jQuery || (window.jQuery.active - window.Error.length) <= 0 && window.jQuery('.blockUI').length === 0)" +
                         "&& (!XMLHttpRequest.active || XMLHttpRequest.active == 0)";
         return runQuiesceScript(quiesceScript);
     }

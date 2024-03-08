@@ -86,7 +86,7 @@ you just need `<dependency>` to get started
    <dependency>
       <groupId>com.github.gopyyn</groupId>
       <artifactId>Salad</artifactId>
-      <version>1.0.6</version>
+      <version>1.0.7</version>
     </dependency>
 </dependencies>
 ```
@@ -101,7 +101,7 @@ Alternatively for [Gradle](https://gradle.org) you need one entries:
         url "https://jitpack.io"
       }
    }
-   testCompile 'com.github.gopyyn:Salad:1.0.6'
+   testCompile 'com.github.gopyyn:Salad:1.0.7'
 ```
 
 ## Quickstart
@@ -136,10 +136,10 @@ Scenario: a different scenario
 Salad feature files can be ran as is. But if you need to define variables then it can be configured with environment file
 
 The configuration should be written in YAML format under __"resources/config/\<environment>.yaml"__
-All the environment variables should be specified in the file. 
+All the environment variables can be specified in the file. 
 >The environment can also be supplied as the VM arguments.
 Example ```-Denvironment=qa```
-> If environment is not specified then it will default to qa
+> If environment is not specified then it will default to env
 
 The configuration is in YAML format and it has 2 major section. system and database
  * system -> specify all the system/global properties here.
