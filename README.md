@@ -72,8 +72,8 @@ Salad can also detect the OS and brings up the default browser for that OS or ju
 ## Getting Started
 Salad requires [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (11 or greater) then either [Eclipse](https://www.eclipse.org/downloads/packages/release/kepler/sr1/eclipse-ide-java-developers) or [IntelliJ](https://www.jetbrains.com/idea/download) to be installed.
 
-## Brazil
-you just need `<dependency>` to get started
+## Maven
+you just need `<dependency>` to pom.xml to get started
 
 ```xml
 <repositories>
@@ -292,8 +292,13 @@ Scenario: enter user id and password
 ```cucumber
 Scenario: click using display text, css, xpath
     And click "Log In"
+    And click "Login"
     And click ".dropdown-toggle click li[data-original-index='1']"
     And click "//h4[normalize-space()='Financial Structure']"
+    
+#if there is more than one element with same name. ex: if there are 5 "Cetify" button
+Scenario: click third cerify button
+    And click "cetify[3]"
 ```
 ## `displays`
 #### assert the HTML element is displayed on the page
@@ -452,12 +457,15 @@ Scenario: add header for rest api
 
 ## Database Commands
 ## `query`
-####executes a sql query in the environment's database
+#### executes a sql query in the environment's database
 query "\<query>"
 <br>The result can be accessed by __"result"__ variable. <br>
 <br>For select, **result** is list in which each row contains KeyValuePair with columnName as key and corresponding value <br>
 <br>For update/insert **result** is list with one row with count and number of affected rows <br>
 Yes you can use variables in the query
+<br><br>
+#### Note: To connect to database
+* the database's driver should be added to dependency in pom.xml or 
 ```
   Scenario: Get the customerId for customer table
     When query "select * from customer where cust_name='${name}'"
