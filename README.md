@@ -46,6 +46,7 @@ Salad can also detect the OS and brings up the default browser for that OS or ju
       <a href="#post">post</a> 
       | <a href="#put">put</a> 
       | <a href="#get">get</a> 
+      | <a href="#header">header</a> 
   </td>
 </tr>
 <tr>
@@ -86,7 +87,7 @@ you just need `<dependency>` to get started
    <dependency>
       <groupId>com.github.gopyyn</groupId>
       <artifactId>Salad</artifactId>
-      <version>1.0.7</version>
+      <version>1.0.8</version>
     </dependency>
 </dependencies>
 ```
@@ -138,8 +139,8 @@ Salad feature files can be ran as is. But if you need to define variables then i
 The configuration should be written in YAML format under __"resources/config/\<environment>.yaml"__
 All the environment variables can be specified in the file. 
 >The environment can also be supplied as the VM arguments.
-Example ```-Denvironment=qa```
-> If environment is not specified then it will default to env
+Example ```-Denvironment=prod``` then salad will look for prod.yaml file for configurations
+> If environment is not specified then it will default to "env"
 
 The configuration is in YAML format and it has 2 major section. system and database
  * system -> specify all the system/global properties here.
@@ -147,7 +148,7 @@ The configuration is in YAML format and it has 2 major section. system and datab
 <tr>
   <th>salad.browser</th>
   <td>
-     valid values are INTERNETEXPLORER, FIREFOX, CHROME, EDGE, OPERA, SAFARI, HEADLESS (chrome with headless).
+     valid values are INTERNETEXPLORER, FIREFOX, CHROME, EDGE, SAFARI, HEADLESS (chrome with headless).
      <br>If not provided then default to EDGE in windows, SAFARI in mac and FIREFOX in linux
   </td>
 </tr>
@@ -237,24 +238,34 @@ public class WebUITest extends SaladTestng {
 ## Web-ui Commands
 ## `go to`
 #### open browser and go to a web page
+Alias `open` or `visit`<br>
 ```cucumber
 Scenario: go to login page
-    go to "${hostname}/Web/Login"
+    go to "http://somesite/login"
+    
+Scenario: go to login page
+    visit "${hostname}/Web" ## hostname can be a variable defined previously in environment or config file or set/def step
 ```
 ## `enter`
 #### enter a value inside the html input field
+Alias `input` or `type`<br>  
 you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element
 <br> enter "\<selector>" "value"
+<br> or
+<br> type "\<selector>" "value"
+<br> or
+<br> input "\<selector>" "value"
+
 ```cucumber
 Scenario: enter user id and password
 # input element is populated with text
     Given enter "User ID" "testUserId" 
     
 # input element is populated with css id
-    And enter "#password" "testPassword"
+    And input "#password" "testPassword"
     
 # input element is populated with css class
-    And enter ".password" "testPassword"
+    And type ".password" "testPassword"
     
 # input element is populated with xpath
     And enter "//input[@value='password']" "testPassword"
@@ -443,12 +454,26 @@ Scenario: add header for rest api
 ## `query`
 ####executes a sql query in the environment's database
 query "\<query>"
-<br>The result can be accessed by __"result"__ variable. response has status and body<br>
+<br>The result can be accessed by __"result"__ variable. <br>
+<br>For select, **result** is list in which each row contains KeyValuePair with columnName as key and corresponding value <br>
+<br>For update/insert **result** is list with one row with count and number of affected rows <br>
 Yes you can use variables in the query
 ```
   Scenario: Get the customerId for customer table
     When query "select * from customer where cust_name='${name}'"
-    Then print "CUST_ID of ${name} is ${result.CUST_ID}"
+    Then print "CUST_ID of ${name} is ${result.[0].CUST_ID}"
+    
+  
+  Scenario: Insert value to PERSON table
+    When query "INSERT INTO PERSON (id, name) values ('1', 'John')"
+    Then print "${result.[0].count}"  
+  
+  Scenario: Multiline query 
+    When query
+    """
+      select * from PERSON where id='2'
+    """
+    And print "Id: ${result.[0].ID} is ${result.[0].NAME}" 
 ```
 
 ## Common Commands
@@ -496,6 +521,7 @@ Scenario: assert car  vaiable
 
 ## `random`
 use `##` random values to populate ui or in rest-api request
+<br> support string, numeric, decimal, alphanumeric
 ```
   Scenario: define variable for pageObjects
 # random string
@@ -519,16 +545,20 @@ you can define a variable for java class and access static methods and variables
 ## `inbuilt Java utilities`
 date, string, and random are the inbuilt utilities<br>
 
-|variable   |class          |
-|:----------|:----------------|
-| date      | java.time.LocalDate   |
-| dateTime  | java.time.LocalDateTime   |
-| string    | org.apache.commons.lang3.StringUtils   |
-| random    | RandomUtils   |
-| salad     | SaladCommands   |
+|variable   | class                                                                    |
+|:----------|:-------------------------------------------------------------------------|
+| date      | com.gopyyn.salad.utils.SaladLocalDate (extension of java.time.LocalDate) |
+| dateTime  | java.time.LocalDateTime                                                  |
+| string    | org.apache.commons.lang3.StringUtils                                     |
+| random    | RandomUtils                                                              |
+| salad     | SaladCommands                                                            |
 ```
     Scenario: default java utility methods
-      * print ${date.now().toString()}
+      * print ${date.now()}
+      * print ${date.now().format('MM/dd/yyyy')}
+      * print ${date.now().minusDays(2).format('MM/dd/yyyy')}
+      * print ${date.now().plusWeeks(1).format('MM/dd/yyyy')}
+      * print ${dateTime.now()}
       * match ${string.join('hello', ' ', 'world')} == "hello world"
       * print ${random.string()}
       * print ${random.string(10)}
@@ -537,6 +567,7 @@ date, string, and random are the inbuilt utilities<br>
       * print ${random.decimal()}
       * print ${random.alphanumeric()}
       * print ${random.alphanumeric(10)}
-      * set contractNumberText = "${salad.getElement("//*[@id='pageheaderContainer']/div[1]").getText()}"
+      * set pageHeaderText = "${salad.getElement("//*[@id='pageheaderContainer']/div[1]").getText()}"
+      * print ${pageHeaderText}
 ```
 

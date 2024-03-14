@@ -44,8 +44,9 @@ Feature: code commands usage
     * match ${mediaType.APPLICATION_JSON} == "application/json"
 
   Scenario: default java utility methods
-    * print ${date.now().toString()}
-    * print ${dateTime.now().toString()}
+    * print ${date.now()}
+    * print ${date.now().format('MM/dd/yyyy')}
+    * print ${dateTime.now()}
     * match ${string.join('hello', ' ', 'world')} == "hello world"
     * print ${random.string()}
     * print ${random.string(10)}

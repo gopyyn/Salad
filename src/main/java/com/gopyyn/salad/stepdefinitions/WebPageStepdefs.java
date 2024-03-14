@@ -10,8 +10,8 @@ import io.cucumber.java.en.*;
 
 public class WebPageStepdefs {
     @Given("^(?:.*)go to \"(.+)\"$")
-    @Given("^(?:.*)visit \"(.+)\"$")
-    @Given("^(?:.*)open \"(.+)\"$")
+    @When("^(?:.*)visit \"(.+)\"$")
+    @And("^(?:.*)open \"(.+)\"$")
     public void gotoUrl(String path) {
         SaladCommands.goTo(path);
     }
@@ -21,7 +21,9 @@ public class WebPageStepdefs {
         SaladCommands.verifyDisplayed(css);
     }
 
-    @Given("^(?:.*)(?:enter|input|type) \"(.+)\"(?:.*)\"(.+)\"$")
+    @Given("^(?:.*)(?:enter) \"(.+)\"(?:.*)\"(.+)\"$")
+    @When("^(?:.*)(?:input) \"(.+)\"(?:.*)\"(.+)\"$")
+    @And("^(?:.*)(?:type) \"(.+)\"(?:.*)\"(.+)\"$")
     public void enter(String displayName, String value) {
         SaladCommands.enter(displayName, value);
     }
@@ -87,7 +89,7 @@ public class WebPageStepdefs {
     @When("^(?:.*?)verify \"(.+)\" (EQUALS|CONTAINS) \"(.+)\"$")
     @Given("^(?:.*?)verify \"(.+)\" (NOT_EQUALS) \"(.+)\"$")
     @Then("^(?:.*?)verify \"(.+)\" (NOT_CONTAINS) \"(.+)\"$")
-    @But("^(?:.*?)verify \"(.+)\" (==|!=|!contains|>|<|>=|<=) \"(.+)\"$")
+    @But("^(?:.*?)verify \"(.+)\" (==|!=|!contains|>|<|>=|<=) \"(.+)?\"$")
     public void verify(String expression, String operators, String rhs) {
         SaladCommands.verify(expression, operators, rhs);
     }

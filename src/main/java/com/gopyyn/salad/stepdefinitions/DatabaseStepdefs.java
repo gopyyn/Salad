@@ -9,4 +9,9 @@ public class DatabaseStepdefs {
     public void query(String query) {
         SaladCommands.query(query);
     }
+
+    @Given("^query")
+    public void queryMultiLine(String query) {
+        SaladCommands.query(query);
+    }
 }

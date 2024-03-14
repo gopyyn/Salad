@@ -1,5 +1,8 @@
 package com.gopyyn.salad.utils;
 
+import com.gopyyn.salad.core.SaladCommands;
+import io.cucumber.core.logging.Logger;
+import io.cucumber.core.logging.LoggerFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -14,6 +17,8 @@ import static com.gopyyn.salad.core.SaladContext.configProperties;
 import static java.util.Optional.ofNullable;
 
 public class HibernateUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SaladCommands.class);
+
     private static StandardServiceRegistry registry;
     private static SessionFactory sessionFactory;
 
@@ -55,12 +60,23 @@ public class HibernateUtils {
     }
 
     public static void closeSession() {
+        try {
+            if (sessionFactory.getCurrentSession().isOpen()) {
+                sessionFactory.getCurrentSession().close();
+            }
+        } catch (Exception e) {
+            LOGGER.debug(e, ()->"unable to close session");
+        }
+    }
+
+    public static void closeSessionFactory() {
         if (sessionFactory != null && sessionFactory.isOpen()) {
             sessionFactory.close();
         }
     }
 
     public static void shutdown() {
+        closeSessionFactory();
         if (registry != null) {
             StandardServiceRegistryBuilder.destroy(registry);
         }

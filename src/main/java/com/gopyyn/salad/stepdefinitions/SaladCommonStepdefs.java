@@ -19,6 +19,7 @@ public class SaladCommonStepdefs {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             activeDrivers.forEach(((key, driver)-> driver.cleanup()));
             HibernateUtils.shutdown();
+            HibernateUtils.closeSession();
         }));
     }
 
@@ -37,15 +38,23 @@ public class SaladCommonStepdefs {
         SaladCommands.print(value);
     }
 
-//    @When("^(?:match|assert) (.+) ([a-zA-Z0-9_=!<>]+) (.+)$")
-    @When("^(?:match|assert) (.+) (EQUALS|CONTAINS|equals|contains) (.+)$")
-    @When("^(?:match|assert) (.+) (NOT_EQUALS) (.+)$")
-    @When("^(?:match|assert) (.+) (NOT_CONTAINS) (.+)$")
-    @When("^(?:match|assert) (.+) (GREATER_THAN) (.+)$")
-    @When("^(?:match|assert) (.+) (LESS_THAN) (.+)$")
-    @When("^(?:match|assert) (.+) (GREATER_THAN_OR_EQUAL_TO) (.+)$")
-    @When("^(?:match|assert) (.+) (LESS_THAN_OR_EQUAL_TO) (.+)$")
-    @When("^(?:match|assert) (.+) (==|!=|!contains|>|<|>=|<=) (.+)$")
+//    @When("^(?:assert|match) (.+) ([a-zA-Z0-9_=!<>]+) (.+)$")
+    @When("^(?:assert) (.+) (EQUALS|CONTAINS|equals|contains) (.+)$")
+    @When("^(?:assert) (.+) (NOT_EQUALS) (.+)$")
+    @When("^(?:assert) (.+) (NOT_CONTAINS) (.+)$")
+    @When("^(?:assert) (.+) (GREATER_THAN) (.+)$")
+    @When("^(?:assert) (.+) (LESS_THAN) (.+)$")
+    @When("^(?:assert) (.+) (GREATER_THAN_OR_EQUAL_TO) (.+)$")
+    @When("^(?:assert) (.+) (LESS_THAN_OR_EQUAL_TO) (.+)$")
+    @When("^(?:assert) (.+) (==|!=|!contains|>|<|>=|<=) (.+)$")
+    @When("^(?:match) (.+) (EQUALS|CONTAINS|equals|contains) (.+)$")
+    @When("^(?:match) (.+) (NOT_EQUALS) (.+)$")
+    @When("^(?:match) (.+) (NOT_CONTAINS) (.+)$")
+    @When("^(?:match) (.+) (GREATER_THAN) (.+)$")
+    @When("^(?:match) (.+) (LESS_THAN) (.+)$")
+    @When("^(?:match) (.+) (GREATER_THAN_OR_EQUAL_TO) (.+)$")
+    @When("^(?:match) (.+) (LESS_THAN_OR_EQUAL_TO) (.+)$")
+    @When("^(?:match) (.+) (==|!=|!contains|>|<|>=|<=) (.+)$")
     public void match(String expression, String operators, String rhs) {
         SaladCommands.match(expression, MatchType.fromValue(operators), rhs);
     }

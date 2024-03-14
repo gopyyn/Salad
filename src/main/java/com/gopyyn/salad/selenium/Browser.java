@@ -14,10 +14,7 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerOptions;
-import org.openqa.selenium.opera.OperaDriver;
-import org.openqa.selenium.opera.OperaOptions;
 import org.openqa.selenium.remote.Augmenter;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
@@ -33,9 +30,8 @@ public enum Browser {
     INTERNETEXPLORER(InternetExplorerDriver.class, new InternetExplorerOptions()),
     FIREFOX(FirefoxDriver.class, new FirefoxOptions()),
     CHROME(ChromeDriver.class, new ChromeOptions()),
-    HEADLESS(ChromeDriver.class, new ChromeOptions().setHeadless(true).addArguments("--window-size=1400,600")),
+    HEADLESS(ChromeDriver.class, new ChromeOptions().addArguments("--window-size=1400,600", "--headless=new")),
     EDGE(EdgeDriver.class, new EdgeOptions()),
-    OPERA(OperaDriver.class, new OperaOptions()),
     SAFARI(SafariDriver.class, new SafariOptions());
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Browser.class);
@@ -44,15 +40,12 @@ public enum Browser {
 
     Browser(Class<? extends WebDriver> webDriverClass, MutableCapabilities capabilities) {
         this.webDriverClass = webDriverClass;
-        capabilities.setCapability(CapabilityType.SUPPORTS_JAVASCRIPT, true);
 
-        if(webDriverClass == InternetExplorerDriver.class) {
+        if(this.webDriverClass == InternetExplorerDriver.class) {
         	capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);  
         	capabilities.setCapability(InternetExplorerDriver.INITIAL_BROWSER_URL, "about:blank"); 
         	capabilities.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION, true);
         }
-
-        capabilities.setCapability(CapabilityType.APPLICATION_NAME, "salad");
 
         this.capabilities = capabilities;
     }
@@ -102,9 +95,6 @@ public enum Browser {
             case EDGE:
                 WebDriverManager.edgedriver().setup();
                 return new EdgeDriver((EdgeOptions) capabilities);
-            case OPERA:
-                WebDriverManager.operadriver().setup();
-                return new OperaDriver((OperaOptions) capabilities);
             case CHROME:
                 WebDriverManager.chromedriver().setup();
                 ChromeOptions options = (ChromeOptions) capabilities;

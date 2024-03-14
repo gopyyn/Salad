@@ -19,14 +19,7 @@ import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.Select;
@@ -35,11 +28,7 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -56,13 +45,7 @@ import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.replaceOnce;
-import static org.apache.commons.lang3.StringUtils.replacePattern;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
-import static org.apache.commons.lang3.StringUtils.substringsBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 import static org.openqa.selenium.support.ui.ExpectedConditions.invisibilityOfAllElements;
@@ -280,6 +263,13 @@ public class SaladCommands {
     }
 
     public static void click(String name) {
+        String index = substringBetween(name, "[", "]");
+        if (isNumeric(index)) {
+            String selectorText = substringBefore(name, "[");
+            click(selectorText, Integer.valueOf(index));
+            return;
+        }
+
         click(name, 1);
     }
 
@@ -311,7 +301,7 @@ public class SaladCommands {
 
         if (nthOccurrence == 1) {
             WebElement element = elements.stream()
-//                    .sorted(Comparator.comparing((e) -> isClickable(e) ? 0 : 1))
+                    .sorted(Comparator.comparing((e) -> isClickable(e) ? 0 : 1))
                     .filter((e) -> isClickable(e))
                     .findFirst()
                     .orElse(null);
@@ -536,6 +526,10 @@ public class SaladCommands {
     }
 
     public static Object parse(String exp) {
+        if (exp == null) {
+            return null;
+        }
+
         exp = removeEnclosingQuotes(exp);
         exp = replaceSaladRandomNotation(exp);
         if (exp.contains("${")) {
@@ -782,7 +776,7 @@ public class SaladCommands {
     }
 
     public static List<Map<String, Object>> query(String query) {
-        return DatabaseContext.execute(parseString(query));
+        return DatabaseContext.execute(parseString(query).trim());
     }
 
     public static String toDbUUID(String uuid){

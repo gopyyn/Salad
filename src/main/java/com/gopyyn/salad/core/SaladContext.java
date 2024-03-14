@@ -41,12 +41,13 @@ public class SaladContext {
             configProperties = mapper.readValue(file, Map.class);
 
         } catch (Exception e) {
-            LOGGER.error(e, () -> format("unable to load configProperties from %s", propertyFileName));
+            LOGGER.info(() -> format("unable to load configProperties %s. If needed, then please define it under resources/config", propertyFileName));
+            LOGGER.trace(e, () -> "error loading configProperty");
         }
     }
 
     private static void loadDefaultJavaHelpers() {
-        globalVariables.put("date", SaladCommands.evalInNashorn("Java.type('java.time.LocalDate')"));
+        globalVariables.put("date", SaladCommands.evalInNashorn("Java.type('com.gopyyn.salad.utils.SaladLocalDate')"));
         globalVariables.put("dateTime", SaladCommands.evalInNashorn("Java.type('java.time.LocalDateTime')"));
         globalVariables.put("string", SaladCommands.evalInNashorn("Java.type('org.apache.commons.lang3.StringUtils')"));
         globalVariables.put("random", SaladCommands.evalInNashorn("Java.type('com.gopyyn.salad.utils.RandomUtils')"));
