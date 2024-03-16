@@ -6,10 +6,11 @@ It is developed using Cucumber and Selenium for Java.
 The BDD syntax popularized by Cucumber is language-neutral, and easy for even non-programmers.
 The backend for the UI testing is written in Selenium for Java.
 
-Salad will provide predefined step-definitions, "Web-ui Commands", "Rest Api Commands" and "Database Commands", which can be used in the existing cucumber feature files.
+Salad will provide predefined step-definitions, "Web-ui Commands", "Rest Api Commands" and "Database Commands", which can be used in the existing cucumber feature files.  
 
-Salad can also detect the OS and brings up the default browser for that OS or just specify which browser in configuration and salad can take care of loading that browser driver. So no need to download browser driver and specify the driver path like you do in selenium.
+Salad can take care of loading that browser driver. So no need to manually download browser's driver and specify the driver path like you do in selenium.  
 
+if scenario fails then the screenshot will be automatically captured under target directory with scenario name.
 # Index
 
 <table>
@@ -37,6 +38,7 @@ Salad can also detect the OS and brings up the default browser for that OS or ju
     | <a href="#hover">hover</a>
     | <a href="#hoverAndClick">hoverAndClick</a>
     | <a href="#scroll-to">scroll to</a>
+    | <a href="#screenshot">screenshot</a>
     | <a href="#fill-page">fill page</a>
     | <a href="#set-value">set value</a>
     | <a href="#skip-browser-restart">skip browser restart</a>
@@ -252,11 +254,11 @@ Scenario: go to login page
 #### enter a value inside the html input field
 Alias `input` or `type`<br>  
 you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element
-<br> enter "\<selector>" "value"
+<br> `enter "\<selector>" "value"`
 <br> or
-<br> type "\<selector>" "value"
+<br> `type "\<selector>" "value"`
 <br> or
-<br> input "\<selector>" "value"
+<br> `input "\<selector>" "value"`
 
 ```cucumber
 Scenario: enter user id and password
@@ -280,7 +282,7 @@ Scenario: enter user id and password
 ```
 ## `select`
 #### select a value from dropdown
-select "\<drowdown element selector>" "dropdown value selector"<br>
+`select "\<drowdown element selector>" "dropdown value selector"`<br>
 "dropdown value selector" can be the option's  value or visible text or index
 >you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
 
@@ -316,9 +318,9 @@ Scenario: assert a vin is displayed in the ui
 ```
 ## `verify`
 #### verify the HTML element value on the page
-1. verify "\<selector>" is \<operation>
+1. `verify "\<selector>" is \<operation>`
 <br>Valid operators CLICKABLE, VISIBLE, INVISIBLE, ENABLED, DISABLED, !CLICKABLE, !VISIBLE, !ENABLED
-2. verify "\<selector>" \<match_operation> ["value"]
+2. `verify "\<selector>" \<match_operation> "value"`
     1. selector will give the value or text of the selected html tag
     2. Valid match_operation are EQUALS, ==, NOT_EQUALS, !=, CONTAINS, contains, NOT_CONTAINS, !contains, GREATER_THAN, >, LESS_THAN, <, GREATER_THAN_OR_EQUAL_TO, >=, LESS_THAN_OR_EQUAL_TO
 >you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
@@ -338,7 +340,7 @@ Scenario: assert landed on customer page
 ```
 ## `wait`
 #### wait for given amount of time
-wait \<number> <MILLI_SECONDS|SECONDS|MINUTES|HOURS>
+`wait \<number> <MILLI_SECONDS|SECONDS|MINUTES|HOURS>`
 ```cucumber
 Scenario: wait for 1 second
     Given wait 1 SECONDS
@@ -346,9 +348,9 @@ Scenario: wait for 1 second
 ```
 ## `wait until`
 #### wait until certain condition is met
-wait until \<selector> [is] <visible|not visible(or !visible)|clickable|not clickable(or !clickable)|enabled|disabled(or !enabled/not enabled)>
+`wait until \<selector> [is] <visible|not visible(or !visible)|clickable|not clickable(or !clickable)|enabled|disabled(or !enabled/not enabled)>`
 <br>OR
-<br>wait until PAGELOAD
+<br>`wait until PAGELOAD`
 >you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
 ```cucumber
 Scenario: wait for 1 second
@@ -358,7 +360,7 @@ Scenario: wait for 1 second
 ```
 ## `hover`
 #### hover a text
-hover "hover element selector"
+`hover "hover element selector"`
 >you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
 ```cucumber
 Scenario: Go to Home page
@@ -366,7 +368,7 @@ Scenario: Go to Home page
 ```
 ## `hoverAndClick`
 #### hover a text and click from the drop down
-hover and click "hover element selector" "click element selector"
+`hover and click "hover element selector" "click element selector"`
 >you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
 ```cucumber
 Scenario: Go to Home page
@@ -374,7 +376,7 @@ Scenario: Go to Home page
 ```
 ## `scroll to`
 #### scroll to the element
-scroll to "element selector"
+`scroll to "element selector"`
 >you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
 ```cucumber
 Scenario: Go to Home page and scroll to trade-in text
@@ -385,7 +387,7 @@ Scenario: Go to Vehicle page and scroll to vin element with css
 ```
 ## `alert`
 #### alert action
-alert "<accept|dismiss|send_text>"
+`alert "<accept|dismiss|send_text>"`
 ```cucumber
 Scenario: Go to Home page
     And alert accept
@@ -393,8 +395,8 @@ Scenario: Go to Home page
 ```
 ## `switch Window`
 #### switch window to the new page or tab
-switch window
-switch window to "<window page>"
+`switch window`<br>
+`switch window to "\<window page>"`
 ```cucumber
 Scenario: switch window to next newly opened page/tab
     And switch window
@@ -403,7 +405,7 @@ Scenario: switch window to main page
 ```
 ## `fill page`
 #### fill page with list of provided values
-fill page "\<json key value>" or fill page "resources:jsonFilePath"
+`fill page "\<json key value>" or fill page "resources:jsonFilePath"`
 <br>key - element selector (CSS,Xpath, display text etc)
 <br>value - value to be entered on the page
 ```cucumber
@@ -415,7 +417,7 @@ Scenario: fill page from json file
 ```
 ## `screenshot`
 #### takes screenshot of current page
-screenshot "file name"
+`screenshot "file name"`
 <br>file name can only be alphanumeric with underscore and hypen
 <br>screenshot file will be under the "target" directory
 <br>if scenario fails then the screenshot will be automatically captured under target directory with scenario name
@@ -426,7 +428,7 @@ Scenario: take screenshot of current page
 
 ## `set value`
 #### Set a named variable with the value from ui-element
-set value variableName = "\<element selector>"
+`set value variableName = "\<element selector>"`
 ```cucumber
 Scenario: assigning a value from ui element
     Given set value contractNumberText = "#pageheaderContainer"
@@ -443,9 +445,9 @@ By default the browser is restarted after every scenario. Sometimes we need to v
 ## Rest Api Commands
 ## `post`
 #### post a message to rest endpoint
-<br>post \<url> \<body>.
+<br>`post \<url> \<body>`
 <br> The result can be accessed by __"response"__ variable. response has status and body
-Yes you can use variables in the url and body. Also body can be read from a file in classpath
+>Yes you can use variables in the url and body. Also body can be read from a file in classpath
 ```cucumber
 Scenario: post body to a rest url
     When post "${hostname}/api/salad/customer" "{"firstName":"##string(8)","lastName":"##string","ssn":"##numeric(9)"}"
@@ -458,7 +460,7 @@ Scenario: post body from file to a rest url
 ```
 ## `put`
 #### put a message to rest endpoint
-<br>put \<url> \<body>.
+<br>`put \<url> \<body>`
 <br> The result can be accessed by __"response"__ variable. response has status and body
 Yes you can use variables in the url and body. Also body can be read from a file in classpath
 ```cucumber
@@ -473,7 +475,7 @@ Scenario: put body from file to a rest url
 ```
 ## `get`
 #### get a message to rest endpoint
-<br>get \<url>.
+<br>`get \<url>`
 <br> The result can be accessed by __"response"__ variable. response has status and body
 Yes you can use variables in the url.
 ```cucumber
@@ -484,8 +486,7 @@ Scenario: get customer from a rest url
 ```
 ### `header`
 #### add a header to Request
-
-header \<name> \<body>
+`header \<name> \<body>`
 ```cucumber
 Scenario: add header for rest api 
     Given header "Accept" "application/json"
@@ -494,7 +495,7 @@ Scenario: add header for rest api
 ## Database Commands
 ## `query`
 #### executes a sql query in the environment's database
-query "\<query>"
+`query "\<query>"`
 <br>The result can be accessed by __"result"__ variable. <br>
 <br>For select, **result** is list in which each row contains KeyValuePair with columnName as key and corresponding value <br>
 <br>For update/insert **result** is list with one row with count and number of affected rows <br>
@@ -525,15 +526,15 @@ Yes you can use variables in the query
 #### Set a named variable for a scenario
 This variable will not be accessible between scenario. This will not be accessible in other scenarios
 ```cucumber
-Scenario: assigning a value:
-    Given def myVar = "hello"
+Scenario: assigning a value with scope is scenario
+    Given set myVar = "hello"
     Then print "${myVar}"
 ```
 ## `def`
 #### Set a named variable for a feature
 This variable will be accessible between scenario under the same feature.
 ```cucumber
-Scenario: assigning a value:
+Scenario: assigning a value with scope as feature
     Given def myVar = "hello"
     
 Scenario: assigning a value:
@@ -550,9 +551,9 @@ Scenario: print two variable
 ```
 ## `match` or `assert`
 #### assert a value
-match "\<lhs>" \<operator> "\<rhs>"
+`match "\<lhs>" \<operator> "\<rhs>"`
 <br>or<br>
-assert "\<lhs>" \<operator> "\<rhs>"
+`assert "\<lhs>" \<operator> "\<rhs>"`
 <br>Valid operators are ==, !=, contains, !contains, <, <=, >, >=
 ```cucumber
 Scenario: assert car  vaiable
