@@ -34,7 +34,9 @@ Salad can also detect the OS and brings up the default browser for that OS or ju
     | <a href="#on-page">on page</a>
     | <a href="#wait">wait</a>
     | <a href="#wait-until">wait until</a>
-    | <a href="#hover-and-click">hover and click</a>
+    | <a href="#hover">hover</a>
+    | <a href="#hoverAndClick">hoverAndClick</a>
+    | <a href="#scroll-to">scroll to</a>
     | <a href="#fill-page">fill page</a>
     | <a href="#set-value">set value</a>
     | <a href="#skip-browser-restart">skip browser restart</a>
@@ -278,12 +280,16 @@ Scenario: enter user id and password
 ```
 ## `select`
 #### select a value from dropdown
-select "\<selector>" "value"
+select "\<drowdown element selector>" "dropdown value selector"<br>
+"dropdown value selector" can be the option's  value or visible text or index
 >you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
 
 ```cucumber
-Scenario: enter user id and password
+Scenario: select the transaction type as cash from dropdown
     And select "Transaction Type:" "Cash"
+
+Scenario: select the transaction type with 2nd index from dropdown
+    And select "Transaction Type:" "2"    
 
 ```
 ## `click`
@@ -350,18 +356,38 @@ Scenario: wait for 1 second
     And wait until ".save-btn" is not visible
     And wait until ".edit-btn" VISIBLE
 ```
-## `hover and click`
-#### hover a text and click from the drop down
-hover and click "hover text" "click text"
+## `hover`
+#### hover a text
+hover "hover element selector"
+>you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
 ```cucumber
-Scenario: Go to Desktop page
-    And hover and click "Menu" "profile"
+Scenario: Go to Home page
+    And hover "Menu"
+```
+## `hoverAndClick`
+#### hover a text and click from the drop down
+hover and click "hover element selector" "click element selector"
+>you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
+```cucumber
+Scenario: Go to Home page
+    And hover and click "Inventory" "Used Vehicle"
+```
+## `scroll to`
+#### scroll to the element
+scroll to "element selector"
+>you can use CSS, XPATH, NAME, CLASSNAME, LINK TEXT or the display text to select an element. refer ```enter``` above to see all possible selector values
+```cucumber
+Scenario: Go to Home page and scroll to trade-in text
+    And scroll to "Trade-in"
+    
+Scenario: Go to Vehicle page and scroll to vin element with css
+    And scroll to "#VIN"
 ```
 ## `alert`
 #### alert action
 alert "<accept|dismiss|send_text>"
 ```cucumber
-Scenario: Go to Desktop page
+Scenario: Go to Home page
     And alert accept
     Then alert dismiss
 ```
@@ -386,6 +412,16 @@ Scenario: fill page
     
 Scenario: fill page from json file
     Given fill page "resources:json/web_fill_page.json"
+```
+## `screenshot`
+#### takes screenshot of current page
+screenshot "file name"
+<br>file name can only be alphanumeric with underscore and hypen
+<br>screenshot file will be under the "target" directory
+<br>if scenario fails then the screenshot will be automatically captured under target directory with scenario name
+```cucumber
+Scenario: take screenshot of current page
+    Given screenshot "Used_Vehicle_Page-2024"
 ```
 
 ## `set value`

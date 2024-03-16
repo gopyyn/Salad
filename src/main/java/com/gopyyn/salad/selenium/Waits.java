@@ -72,7 +72,6 @@ public class Waits {
                 .pollingEvery(Duration.ofMillis(getRelativeWait(FLUENT_POLLING_IN_MS)));
 
         wait.until(driver -> isPageLoaded());
-        SaladCommands.runSaladScript();
     }
 
     private Boolean isPageLoaded() {

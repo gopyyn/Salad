@@ -7,14 +7,12 @@ import java.util.regex.Pattern;
 
 import static com.gopyyn.salad.enums.SelectorType.*;
 import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.contains;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.toRootLowerCase;
-import static org.apache.commons.lang3.StringUtils.trim;
+import static org.apache.commons.lang3.StringUtils.*;
 
 public class Selector {
     private static final Pattern CSS_PATTERN = Pattern.compile("((((abbr|acronym|address|applet|area|article|aside|audio|base|basefont|bdi|bdo|big|blockquote|body|br|button|canvas|center|cite|code|col|cogroup|datalist|data|dd|del|details|dfn|dialog|dir|div|dl|dt|embed|em|fieldset|figcaption|figure|font|footer|form|frameset|frame|header|head|html|iframe|img|input|ins|kbd|label|legend|link|li|main|map|mark|meta|meter|nav|noframes|noscript|object|ol|optgroup|option|output|parm|picture|pre|progress|rp|rt|ruby|samp|script|section|select|small|source|span|strike|strong|style|sub|summary|sup|svg|table|tbody|td|template|txtarea|tfoot|thead|th|time|title|track|tr|tt|ul|var|video|wbr|a|b|i|p|r|s|q|u)\\b)|[\\.#@\\+:\\-][\"']?\\w+[\"']?)(\\[[a-zA-Z0-9_\\-]+([|^$*]?=[\"'][a-zA-Z0-9_ \\.\\-]+[\"'])?\\])?|[ <>&])+");
     public static final String LINK_SELECTOR = "link=";
+    public static final String XPATH_SELECTOR = "xpath=";
     public static final String CSS_SELECTOR = "css=";
     public static final String CLASS_SELECTOR = "class=";
     public static final String NAME_SELECTOR = "name=";
@@ -26,6 +24,7 @@ public class Selector {
         this.expression = expression;
         if (isXpath(expression)) {
             this.type = XPATH;
+            expression = expression.replace(XPATH_SELECTOR, "");
             this.by = By.xpath(expression);
         } else if (isName(expression)) {
             this.type = NAME;
@@ -67,7 +66,7 @@ public class Selector {
     }
 
     private boolean isXpath(String text) {
-        return text.startsWith("/");
+        return expression.startsWith(XPATH_SELECTOR) || text.startsWith("/");
     }
 
     public SelectorType getType() {

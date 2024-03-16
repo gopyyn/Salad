@@ -15,9 +15,12 @@ Feature: Demo Login Page
     Given go to "http://www.phptravels.net/login"
     And enter "Email" "user@phptravels.com"
     And enter "Password" "demouser"
-    And click "Login[1]"
+    And click "Login[4]"
     And wait until PAGELOAD
     And wait until "Welcome Back" is VISIBLE
     Then verify "Wallet Balance" is VISIBLE
     And click "My Profile"
+    And take screenshot "screen_shoot-2024"
     And verify "name=email" == "user@phptravels.com"
+    And click "my bookings"
+    And select "name=DataTables_Table_0_length" "3"

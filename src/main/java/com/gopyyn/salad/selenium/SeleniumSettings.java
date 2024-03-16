@@ -10,7 +10,8 @@ import java.net.URL;
 /**
  * Configurable through the following system configProperties:
  * 
- * salad.browser - Browser to use for the test selenium.remote - If true, direct tests to the
+ * salad.browser - Browser to use for the test
+ * selenium.remote - If true, direct tests to the
  * selenium.host - selenium grid Host name of the selenium grid hub
  * selenium.port - selenium grid Port the selenium grid hub is running on
  *

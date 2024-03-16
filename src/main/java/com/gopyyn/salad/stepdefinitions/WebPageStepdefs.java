@@ -33,14 +33,14 @@ public class WebPageStepdefs {
         SaladCommands.select(displayName, value);
     }
 
+    @Given("^(?:.*)deselect \"(.+)\"$")
+    public void deselect(String displayName) {
+        SaladCommands.deselect(displayName);
+    }
+
     @When("^(?:.*)click \"(.+)\"$")
     public void click(String name) {
        SaladCommands.click(name);
-    }
-
-    @When("^(?:.*)click \"(.+)\"[(\\d+)]")
-    public void clickWithIndex(String name, int nthOccurrence) {
-        SaladCommands.click(name, nthOccurrence);
     }
 
 //    @And("wait {int} {timeUnit}")
@@ -75,9 +75,19 @@ public class WebPageStepdefs {
         SaladCommands.waitUntil(type);
     }
 
-    @Given("^(?:.*)hover and click \"(.+)\" \"(.+)\"$")
+    @Given("^(?:.*)hoverAndClick \"(.+)\" \"(.+)\"$")
     public void hoverAndClick(String selector, String clickText) {
         SaladCommands.hoverAndClick(selector, clickText);
+    }
+
+    @Given("^(?:.*)hover \"(.+)\"$")
+    public void hover(String selector) {
+        SaladCommands.hover(selector);
+    }
+
+    @Given("^(?:.*)scroll to \"(.+)\"$")
+    public void scrollTo(String selector) {
+        SaladCommands.scrollTo(selector);
     }
 
     @Given("^(?:.*)on page \"(.+)\"$")
@@ -121,8 +131,13 @@ public class WebPageStepdefs {
     }
 
     @Given("^(?:.*)set value (\\w) = \"(.+)\"$")
-    public void defineScenarioVar(String name, String value) {
+    public void setValueOfElement(String name, String value) {
         SaladCommands.setValue(name.replaceAll("^(?:.*)['\"]", ""), value);
+    }
+
+    @Given("^(?:.*)screenshot \"([a-zA-Z0-9_\\-]*)\"$")
+    public void screenshot(String name) {
+        SaladCommands.takeScreenshot(name);
     }
 
 //    @And("^(?:.*)alert {alertAction}")

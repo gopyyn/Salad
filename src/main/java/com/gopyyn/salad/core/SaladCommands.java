@@ -28,10 +28,10 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
@@ -53,24 +53,17 @@ import static org.openqa.selenium.support.ui.Sleeper.SYSTEM_SLEEPER;
 
 public class SaladCommands {
     private static final Logger LOGGER = LoggerFactory.getLogger(SaladCommands.class);
-    public static final String SPECIAL_CHARACTER_REGEX = "[^a-zA-Z0-9 _-]";
     public static final ObjectMapper mapper = new ObjectMapper();
     private static final int ONE_SECOND = 1;
     private static final int MIN_WAIT_SECONDS = 5;
     private static final List CLICKABLE_ELEMENTS = asList("button", "input", "select", "a", "textarea", "fieldset");
-    private static final String SALAD_JS;
     public static final List<String> INPUT_TAGS = asList("input", "select");
-
-    static {
-        SALAD_JS = getSaladJs();
-    }
 
     private SaladCommands() {
     }
 
     public static void goTo(String path) {
         getDriver().get(parseString(path));
-        runSaladScript();
     }
 
     public static RemoteWebDriver getDriver() {
@@ -141,7 +134,7 @@ public class SaladCommands {
     private static void enter(WebElement inputElement, String value) {
         shortWaitForElementToBeClickable(inputElement);
         if ("select".equalsIgnoreCase(inputElement.getTagName())) {
-            new Select(inputElement).selectByVisibleText(parseString(value));
+            select(inputElement, value);
         } else if ("checkbox".equalsIgnoreCase(inputElement.getAttribute("type")) ||
                 "radio".equalsIgnoreCase(inputElement.getAttribute("type"))) {
             inputElement.click();
@@ -149,6 +142,50 @@ public class SaladCommands {
             inputElement.sendKeys(parseString(value));
             inputElement.sendKeys(Keys.TAB);
             new Actions(getDriver()).keyDown(Keys.SHIFT).sendKeys(Keys.TAB).keyUp(Keys.SHIFT).perform();
+        }
+    }
+
+    private static void select(WebElement inputElement, String value) {
+        String dropdown = parseString(value);
+        Select selectElement = new Select(inputElement);
+
+        try {
+            selectElement.selectByVisibleText(dropdown);
+        } catch (NoSuchElementException e) {
+            try {
+                selectElement.selectByValue(dropdown);
+            } catch (Exception ex) {
+                if (!isNumeric(dropdown)) {
+                    throw ex;
+                }
+                selectElement.selectByIndex(Integer.valueOf(dropdown));
+            }
+        }
+    }
+
+    public static void deselect(String selector) {
+        new Select(getInputElement(selector)).deselectAll();
+    }
+
+    public static void deSelect(String selector, String value) {
+        deSelect(getInputElement(selector), value);
+    }
+
+    private static void deSelect(WebElement inputElement, String value) {
+        String dropdown = parseString(value);
+        Select selectElement = new Select(inputElement);
+
+        try {
+            selectElement.deselectByVisibleText(dropdown);
+        } catch (NoSuchElementException e) {
+            try {
+                selectElement.deselectByValue(dropdown);
+            } catch (Exception ex) {
+                if (!isNumeric(dropdown)) {
+                    throw ex;
+                }
+                selectElement.deselectByIndex(Integer.valueOf(dropdown));
+            }
         }
     }
 
@@ -270,15 +307,17 @@ public class SaladCommands {
             return;
         }
 
-        click(name, 1);
+        click(name, -1);
     }
 
-    public static void click(String name, int nthOccurrence) {
+    public static void click(String selector, int nthOccurrence) {
         try {
-            clickBasic(name, nthOccurrence);
+            clickBasic(selector, nthOccurrence);
         } catch (RuntimeException e) {
-            shortWaitForElementToBeClickable(name);
-            clickBasic(name, nthOccurrence);
+            WebElement clickElement = getClickElement(selector, nthOccurrence);
+            scroll(clickElement);
+            shortWaitForElementToBeClickable(clickElement);
+            clickElement.click();
         }
         waitUntil(VerifyType.PAGELOAD);
     }
@@ -286,7 +325,6 @@ public class SaladCommands {
     private static void clickBasic(String name, int nthOccurrence) {
         waitUntil(VerifyType.PAGELOAD);
         WebElement clickElement = getClickElement(name, nthOccurrence);
-        scroll(clickElement);
         clickElement.click();
     }
 
@@ -299,7 +337,7 @@ public class SaladCommands {
             throw new CucumberException(format("Unable to find clickable %s", name));
         }
 
-        if (nthOccurrence == 1) {
+        if (nthOccurrence == -1) {
             WebElement element = elements.stream()
                     .sorted(Comparator.comparing((e) -> isClickable(e) ? 0 : 1))
                     .filter((e) -> isClickable(e))
@@ -314,8 +352,9 @@ public class SaladCommands {
             if (clickableChild != null) {
                 return clickableChild;
             }
+            return elements.get(elements.size()-1);
         }
-        return elements.get(nthOccurrence -1);
+        return elements.get(nthOccurrence-1);
     }
 
     private static WebElement getClickableChild(List<WebElement> elements) {
@@ -330,37 +369,6 @@ public class SaladCommands {
 
     private static boolean isClickable(WebElement element) {
         return CLICKABLE_ELEMENTS.contains(element.getTagName());
-    }
-
-    private static String getSaladJs() {
-        try {
-            InputStream inputStream = SaladContext.class.getClassLoader()
-                    .getResourceAsStream("js/salad.js");
-            return new BufferedReader(
-                    new InputStreamReader(inputStream, StandardCharsets.UTF_8))
-                    .lines()
-                    .collect(Collectors.joining("\n"));
-        } catch (RuntimeException e) {
-            LOGGER.error(e, () -> "unable to run the javascript file");
-            return null;
-        }
-    }
-
-     public static Boolean runSaladScript() {
-        if (SALAD_JS == null) {
-            return false;
-        }
-
-         return runScript(SALAD_JS);
-     }
-
-    public static Boolean runScript(String js) {
-        try {
-            return (Boolean) getDriver().executeScript(js);
-        } catch (WebDriverException e) {
-            LOGGER.error(e, () -> "unable to run ");
-            return false;
-        }
     }
 
     public static void wait(long waitTime, TimeUnit unit) {
@@ -483,8 +491,8 @@ public class SaladCommands {
     }
 
     public static void hoverAndClick(String hoverLinkName, String clickLinkName) {
-        hoverAndClick(By.xpath(format("//a[normalize-space()='%s']", hoverLinkName)),
-                By.xpath(format("//a[normalize-space()='%s']", clickLinkName)),
+        hoverAndClick(getSelector(hoverLinkName).getBy(),
+                getSelector(clickLinkName).getBy(),
                 false);
     }
 
@@ -497,6 +505,10 @@ public class SaladCommands {
         targetLink.click();
     }
 
+    public static WebElement hover(String locatorText) {
+        return hover(getSelector(locatorText).getBy());
+    }
+
     public static WebElement hover(By locator) {
         WebDriver driver = Driver.instance().getDriver();
         WebElement element = driver.findElement(locator);
@@ -504,6 +516,9 @@ public class SaladCommands {
         return element;
     }
 
+    public static void scrollTo(String selectorText) {
+        scroll(getElement(selectorText));
+    }
 
     public static void scroll(WebElement element) {
         ((JavascriptExecutor) getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
@@ -765,11 +780,11 @@ public class SaladCommands {
         }
     }
 
-    public static void takeScreenshot(String methodName) {
+    public static void takeScreenshot(String fileName) {
         try {
             TakesScreenshot screenshotTaker = ((TakesScreenshot) Driver.instance().getDriver());
             File sourceFile = screenshotTaker.getScreenshotAs(OutputType.FILE);
-            FileUtils.copyFile(sourceFile, new File("target/" + methodName + ".png"));
+            FileUtils.copyFile(sourceFile, new File("target/" + fileName + ".png"));
         } catch (IOException e) {
             LOGGER.error(e, () -> "Unable to take screen shot");
         }
