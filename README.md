@@ -523,15 +523,15 @@ Yes you can use variables in the query
 
 ## Common Commands
 ## `set`
-#### Set a named variable for a scenario
-This variable will not be accessible between scenario. This will not be accessible in other scenarios
+#### Set a named variable accessible with in a scenario
+This variable will not be accessible between scenario
 ```cucumber
 Scenario: assigning a value with scope is scenario
     Given set myVar = "hello"
     Then print "${myVar}"
 ```
 ## `def`
-#### Set a named variable for a feature
+#### Set a named variable which is accessed between scenario
 This variable will be accessible between scenario under the same feature.
 ```cucumber
 Scenario: assigning a value with scope as feature
