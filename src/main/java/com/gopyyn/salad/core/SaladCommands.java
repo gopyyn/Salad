@@ -15,10 +15,10 @@ import io.cucumber.core.exception.CucumberException;
 import io.cucumber.core.logging.Logger;
 import io.cucumber.core.logging.LoggerFactory;
 import io.cucumber.java.Scenario;
-import net.minidev.json.parser.JSONParser;
-import net.minidev.json.parser.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -94,7 +94,7 @@ public class SaladCommands {
         return element.getText();
     }
 
-    private static WebElement getVisibleElement(String name) {
+    public static WebElement getVisibleElement(String name) {
         List<WebElement> elements = getElements(name);
         return elements.stream()
                 .filter(WebElement::isDisplayed)
@@ -118,7 +118,7 @@ public class SaladCommands {
         }
     }
 
-    private static List<WebElement> getElements(String name) {
+    public static List<WebElement> getElements(String name) {
         return getDriver().findElements(getSelector(name).getBy());
     }
 
@@ -362,7 +362,7 @@ public class SaladCommands {
             return elements.get(0)
                             .findElement(By.xpath(".//" + join("|.//", CLICKABLE_ELEMENTS)));
         } catch (Exception e) {
-            LOGGER.error(e, () -> "no clickable child element");
+            LOGGER.trace(e, () -> "no clickable child element");
         }
         return null;
     }
@@ -615,23 +615,12 @@ public class SaladCommands {
 
     public static final boolean isJson(Object o) {
         if (o instanceof String) {
-            String str = o.toString().trim();
-            if (str.length() <= 1) {
-                return false;
-            }
-            char startChar = str.charAt(0);
-            char endChar = str.charAt(str.length() - 1);
-            if ((startChar != '[' || endChar != ']') && (startChar != '{' || endChar != '}')) {
-                return false;
-            }
-
             try {
-                (new JSONParser(-1)).parse(str);
-                return true;
-            } catch (ParseException e) {
-                LOGGER.debug(e, () -> "unable to parse json");
+                new JSONObject(o);
+            } catch (JSONException e) {
                 return false;
             }
+            return true;
         }
         return false;
     }

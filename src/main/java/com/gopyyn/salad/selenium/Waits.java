@@ -87,7 +87,7 @@ public class Waits {
             return (Boolean) javaScriptExecutor.executeScript(quiesceScript);
         } catch (WebDriverException e) {
             webDriver.navigate().refresh();
-            LOGGER.error("Application did not quiesce", e);
+            LOGGER.debug("Application did not quiesce", e);
             return false;
         }
     }
